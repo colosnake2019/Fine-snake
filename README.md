@@ -1,4 +1,42 @@
+
 # starter-snake-python
+### Start the engine:sparkling_heart:
+1. Install Brew
+
+		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+2. Install Git
+
+		brew install git
+
+3. Install Jq
+	
+	
+		brew install jq
+
+4. Install Wget
+
+		brew install wget
+
+5. Download the Engine
+
+		mkdir battlesnake-engine
+		cd battlesnake-engine
+		wget -qO- `curl -s https://api.github.com/repos/battlesnakeio/engine/releases/latest \
+		    | jq -r ".assets[] | select(.name) | .browser_download_url" | grep Darwin | grep 64` \
+		    | bsdtar -xvf-
+
+6. Run the engine in dev mode
+
+		./engine dev
+
+7. Open a browser and go to [http://localhost:3010/](http://localhost:3010/)
+
+
+
+----
+
+
 
 A simple [Battlesnake AI](http://battlesnake.io) written in Python. 
 
