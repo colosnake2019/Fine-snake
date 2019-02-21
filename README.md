@@ -68,7 +68,9 @@ heroku logs --tail
 ```
 
 
-## Start the engine:sparkling_heart:
+## [Start the engine](https://docs.battlesnake.io/):sparkling_heart:
+
+**MAC OS Example:**   
 1. Install Brew
 
 		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -100,12 +102,8 @@ heroku logs --tail
 
 7. Open a browser and go to [http://localhost:3010/](http://localhost:3010/)
 
-8. Open another browser and go to [http://localhost:3009/?engine=http://0.0.0.0:8080/&game=<colo>](http://localhost:3009/?engine=http://0.0.0.0:8080/&game=<colo>)
+
 ----
-
-9. Start your game on [http://localhost:3010/](http://localhost:3010/)
-
-
 ## Questions?
 
 Email [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), or tweet [@send_with_us](http://twitter.com/send_with_us).
