@@ -1,4 +1,13 @@
+
+
+from main import isSafe
+
+board_width = 20
+board_height = 20
+board_ = [[0 for x in range(board_width)] for y in range(board_height)]
+
 #general method of getting the path
+
 def get_path(parent, start, end):
     child = end 
     path = [end]
@@ -29,34 +38,35 @@ def get_distance(start, end):
     return distance
 
 # in this method, could optimal the child list, like put them in order and check the security
-def createChild(position, goal, board_width, board_height): 
+def createChild(position, goal, board=board_): 
     childList = {}
     # all these check should be covered by method isSafe(), we don't need the board_width and board_height
     # right now just write like this for testing
+    x = position[0]
+    y = position[1]
 
-    if position[0] - 1 < board_width and position[0] - 1 >= 0: 
-        left = (position[0] - 1, position[1])
-        childList[left] = get_distance(left, goal) # add left direction
-
-    if position[1] - 1 < board_height and position[1] - 1 >= 0: 
-        down = (position[0], position[1] - 1)   
-        childList[down] = get_distance(down, goal) # add down direction
-
-    if position[0] + 1 < board_width and position[0] + 1 >= 0:
-        right = (position[0] + 1, position[1])
-        childList[right] = get_distance(right, goal) # add right direction
-
-    if position[1] + 1 < board_height and position[1] + 1 >= 0:  
-        up = (position[0], position[1] + 1)     
-        childList[up] = get_distance(up, goal) # add up direction
-
-    #sorted_by_value = sorted(childList.items(), key=lambda kv: kv[1])
-    #print 'position', position, 'childList', childList.keys()
-    return childList.keys()  # [(12, 15), (12, 14), (11, 13), (13, 13)]
+    if isSafe(x-1, y, board):
+        next = (x-1,y)
+        childList[get_distance(next, goal)] = next
+    if isSafe(x+1, y, board):
+        next = (x+1,y)
+        childList[get_distance(next, goal)] = next
+    if isSafe(x, y-1, board):
+        next = (x,y-1)
+        childList[get_distance(next, goal)] = next
+    if isSafe(x, y+1, board):
+        next = (x,y+1)
+        childList[get_distance(next, goal)] = next
 
 
-def dfs(start_state, goal_state):
-    frontier = createChild(start_state, goal_state, 20, 20)
+    sorted_children = sorted(childList)
+    print("sorted_children is "+str(sorted_children))
+
+    return sorted_children.values()  # [(12, 15), (12, 14), (11, 13), (13, 13)]
+
+
+def dfs(start_state, goal_state, board=board_):
+    frontier = createChild(start_state, goal_state, board)
     frontier_size = len(frontier)
     explored = []
     explored.append(start_state)
@@ -80,10 +90,9 @@ def dfs(start_state, goal_state):
         #print 'explored', explored
         #print 'frontier', frontier
     return None
-
 print(dfs((12, 7), (16, 5))) # notice here we are using tuples, as dictionary cannot hash list
-
-DFS(current_pos, goal_state):
+ 
+def DFS(current_pos, goal_state):
     x = current_pos[0]
     y = current_pos[1]
     childrenStates = [(x+1, y), (x-1, y), (x, y-1), (x, y+1)]
@@ -92,7 +101,7 @@ DFS(current_pos, goal_state):
             return child
     return null
 
-dfs_solution(current_pos, goal_state):
+def dfs_solution(current_pos, goal_state):
     frontier = createChild(start_state, goal_state, 20, 20)
     explored = []
     explored.append(start_state)

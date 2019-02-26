@@ -42,7 +42,7 @@ def setBoard(data):
         
     # set head positions and longer snakes' potential next head positions
     snakes_heads = get_snakes_head_positions(data['board']['snakes'], data['you']['id'], len(data['you']['body']))
-    
+
     for head_frag in snakes_heads:
         if((head_frag['y']>=0) and (head_frag['y']<board_height) and (head_frag['x']>=0) and (head_frag['x']<board_width)):
             board[head_frag['y']][head_frag['x']] = 1
@@ -53,7 +53,7 @@ def setBoard(data):
     return board;
 
 # 0/5: safe 1:danger
-def isSafe(x, y, board):
+def isSafe(x, y, board=board_):
     return board[y][x] == 0 or board[y][x] == 5;
 
 # this method will return an array of coordinates of all the snakes' bodies.
@@ -182,8 +182,8 @@ def move():
             snake AI must choose a direction to move in.
     """
     # print(json.dumps(data))
-    board = setBoard(data)
-    directions = next_direction_options(data, board)
+    board_ = setBoard(data)
+    directions = next_direction_options(data, board_)
     direction = random.choice(directions)
 
     return move_response(direction)
