@@ -8,55 +8,52 @@ import bottle
 
 from api import ping_response, start_response, move_response, end_response
 #------------------------------------------------methods----------------------------------------------
-# this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
-def next_direction_options(data):
-    print 'data:' , data
-    print 'turn: ', data['turn']
-    
-    directions = []
 
-    my_head = data['you']['body'][0]
-    my_head_x = my_head['x']
-    my_head_y = my_head['y']
+# -----------------------------
+# | 0 | 0 | 5 | 0 | 0 | 0 | 8 |
+# -----------------------------
+# | 0 | 1 | 1 | 1 | 0 | 0 | 0 |
+# -----------------------------
+# | 0 | 5 | 0 | 0 | 0 | 0 | 0 |
+# -----------------------------
+# | 1 | 0 | 0 | 0 | 0 | 5 | 0 |
+# -----------------------------
+# | 1 | 0 | 0 | 5 | 0 | 0 | 0 |
+# -----------------------------
+# | 1 | 1 | 0 | 0 | 0 | 1 | 0 |
+# -----------------------------
+# | 0 | 5 | 0 | 0 | 0 | 1 | 1 |
+# -----------------------------
+# 0: safe 1: danger 5:food
+def setBoard(data):
+    board_width = data['board']['width']
+    board_height = data['board']['height']
+    board = [[0 for x in range(board_width)] for y in range(board_height)]
 
-    snakes_bodies = get_snakes_body_positions(data['board']['snakes'])     
+    # set food positions
+    food = get_food_positions(data)
+    for each_food in food:
+        board[each_food['y']][each_food['x']] = 5
+
+    # set body positions
+    snakes_bodies = get_snakes_body_positions(data['board']['snakes'])
+    for body_frag in snakes_bodies:
+        board[body_frag['y']][body_frag['x']] = 1
+        
+    # set head positions and longer snakes' potential next head positions
     snakes_heads = get_snakes_head_positions(data['board']['snakes'], data['you']['id'], len(data['you']['body']))
+    for head_frag in snakes_heads:
+        if((head_frag['y']>=0) and (head_frag['y']<board_height) and (head_frag['x']>=0) and (head_frag['x']<board_width)):
+            board[head_frag['y']][head_frag['x']] = 1
 
-    print 'bodies: ',snakes_bodies
-    print '\n'
-    print 'heads: ', snakes_heads
-    print '\n' 
+    print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
+      for row in board]))
 
+    return board;
 
-    #check if we can move up
-    if (my_head['y']-1 >= 0):#avoid the wall
-        next_head_loc = {'x': my_head_x, 'y': my_head_y-1}
-        if ((next_head_loc in snakes_bodies)==False):#avoid self bodies and others' bodies
-            if((next_head_loc in snakes_heads)==False): #avoid snakes' head positions and longer snakes' potential next-step head positions
-                directions.append('up')
-
-    #check if we can move right
-    if (my_head['x']+1 <= (data['board']['width']-1)):
-        next_head_loc = {'x': my_head_x+1, 'y': my_head_y}
-        if ((next_head_loc in snakes_bodies)==False):
-            if((next_head_loc in snakes_heads)==False):
-                directions.append('right')
-
-    #check if we can move down
-    if (my_head['y']+1 <= (data['board']['height']-1)):
-        next_head_loc = {'x': my_head_x, 'y': my_head_y+1}
-        if ((next_head_loc in snakes_bodies)==False):
-            if((next_head_loc in snakes_heads)==False):
-                directions.append('down')
-
-    #check if we can move left
-    if (my_head['x']-1 >= 0):
-        next_head_loc = {'x': my_head_x-1, 'y': my_head_y}
-        if ((next_head_loc in snakes_bodies)==False):
-            if((next_head_loc in snakes_heads)==False):
-                directions.append('left')
-
-    return directions;
+# 0/5: safe 1:danger
+def isSafe(x, y, board):
+    return board[y][x] == 0 or board[y][x] == 5;
 
 # this method will return an array of coordinates of all the snakes' bodies.
 def get_snakes_body_positions(snakes):
@@ -76,15 +73,61 @@ def get_snakes_head_positions(snakes, self_id, self_length):
             result.append(snake_head_current)
             snake_length = len(snake['body'])
             if (snake_length >= self_length):
-                #the longer snake's potential next-step head position
+                #the longer snake's (or same-length snake) potential next-step head position
                 cur_x = snake_head_current['x']
                 cur_y = snake_head_current['y']
                 result.append({'x':cur_x, 'y': cur_y-1})#up
                 result.append({'x':cur_x, 'y': cur_y+1})#down
                 result.append({'x':cur_x+1, 'y': cur_y})#right
                 result.append({'x':cur_x-1, 'y': cur_y})#left
+        else:
+            snake_head_current = snake['body'][0]
+            result.append(snake_head_current)
+
     return result;
 
+# this method will return an array of food positions. 
+def get_food_positions(data):
+    return data['board']['food'];
+
+# calculate the distance between two points
+def get_distance(x1, y1, x2, y2):
+    distance = ((x1-x2)**2)+((y1-y2)**2)
+    return distance;
+
+
+# this method should be removed later
+# this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
+def next_direction_options(data, board):
+    # print 'data:' , data
+    print 'turn: ', data['turn']
+    
+    directions = []
+    x = data['you']['body'][0]['x']
+    y = data['you']['body'][0]['y']
+
+    #check if we can move up
+    if (y-1>=0):
+        if(isSafe(x, y-1, board)):
+            directions.append('up')
+
+    #check if we can move right
+    if (x+1<=(data['board']['width']-1)):
+        if(isSafe(x+1, y, board)):
+            directions.append('right')
+
+    #check if we can move down
+    if (y+1<=(data['board']['height']-1)):
+            if(isSafe(x, y+1, board)):
+                directions.append('down')
+
+    #check if we can move left
+    if (x-1>=0):
+        if(isSafe(x-1, y, board)):
+            directions.append('left')
+
+    print directions;
+    return directions;
 #------------------------------------------------API calls------------------------------------------------------
 @bottle.route('/')
 def index():
@@ -138,8 +181,8 @@ def move():
             snake AI must choose a direction to move in.
     """
     # print(json.dumps(data))
-
-    directions = next_direction_options(data)
+    board = setBoard(data)
+    directions = next_direction_options(data, board)
     direction = random.choice(directions)
 
     return move_response(direction)
