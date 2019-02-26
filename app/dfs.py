@@ -1,13 +1,16 @@
 
+from collections import OrderedDict
 
-from main import isSafe
 
-board_width = 20
-board_height = 20
-board_ = [[0 for x in range(board_width)] for y in range(board_height)]
+# 0/5: safe 1:danger
+def isSafe(x, y, board):
+    if y<0 or y>(len(board)-1):
+        return False
+    if x<0 or x>(len(board[0])-1):
+        return False
+    return board[y][x] == 0 or board[y][x] == 5;
 
 #general method of getting the path
-
 def get_path(parent, start, end):
     child = end 
     path = [end]
@@ -33,12 +36,13 @@ def get_path(parent, start, end):
     path.reverse()
     return path
 
+# calculate the distance between two points
 def get_distance(start, end):
     distance = ((start[0]-start[1])**2)+((end[0]-end[1])**2)
     return distance
 
 # in this method, could optimal the child list, like put them in order and check the security
-def createChild(position, goal, board=board_): 
+def createChild(position, goal, board): 
     childList = {}
     # all these check should be covered by method isSafe(), we don't need the board_width and board_height
     # right now just write like this for testing
@@ -58,60 +62,32 @@ def createChild(position, goal, board=board_):
         next = (x,y+1)
         childList[get_distance(next, goal)] = next
 
+    sorted_children = OrderedDict(sorted(childList.items()))
 
-    sorted_children = sorted(childList)
-    print("sorted_children is "+str(sorted_children))
+    # return sorted_children.values()  # [(12, 15), (12, 14), (11, 13), (13, 13)]
+    return sorted_children.values()
 
-    return sorted_children.values()  # [(12, 15), (12, 14), (11, 13), (13, 13)]
-
-
-def dfs(start_state, goal_state, board=board_):
-    frontier = createChild(start_state, goal_state, board)
-    frontier_size = len(frontier)
-    explored = []
-    explored.append(start_state)
-    parent = {}
-    for child in frontier:
-        parent[child] = start_state
-    path = []
-    while frontier:
-        node = frontier.pop()
-        # frontier_size = frontier_size - 1
-        explored.append(node)
-        if node == goal_state:
-            path = get_path(parent, start_state, goal_state)
-            return ("path", path)
-        child_list = createChild(node, goal_state, 20, 20)  #the neighbors of the current position          
-        # for child in child_list:
-        #     if child not in explored and child not in frontier:
-        #         parent[child] = node
-        frontier.extend(child for child in child_list if child not in explored and child not in frontier)
-        # frontier_size = frontier_size + 1
-        #print 'explored', explored
-        #print 'frontier', frontier
-    return None
-print(dfs((12, 7), (16, 5))) # notice here we are using tuples, as dictionary cannot hash list
- 
-def DFS(current_pos, goal_state):
+def DFS(current_pos, goal_state, board):
     x = current_pos[0]
     y = current_pos[1]
-    childrenStates = [(x+1, y), (x-1, y), (x, y-1), (x, y+1)]
+    childrenStates = createChild((x,y), goal_state, board)
+    print 'in DFS, DFS is ', childrenStates
     for child in childrenStates: 
-        if dfs_solution(child, goal_state):
+        if dfs_solution(child, goal_state, board):
             return child
-    return null
+    return childrenStates[0]
 
-def dfs_solution(current_pos, goal_state):
-    frontier = createChild(start_state, goal_state, 20, 20)
+def dfs_solution(current_pos, goal_state, board):
+    frontier = createChild(current_pos, goal_state, board)
     explored = []
-    explored.append(start_state)
+    explored.append(current_pos)
     while frontier:
         node = frontier.pop()
         explored.append(node)
         if node == goal_state:
-            return true
-        child_list = createChild(node, goal_state, 20, 20)
+            return True
+        child_list = createChild(node, goal_state, board)
         frontier.extend(child for child in child_list if child not in explored and child not in frontier)
-    return false
+    return False
 
 
