@@ -21,6 +21,7 @@ def get_distance(x1, y1, x2, y2):
 
 # this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
 def next_direction_options(data):
+    print 'data:' , data
     print 'turn: ', data['turn']
     
     directions = []
@@ -133,8 +134,10 @@ def start():
     # print(json.dumps(data))
 
     color = "#FF69B4"
+    headType = "silly"
+    tailType = "bolt"
 
-    return start_response(color)
+    return start_response(color, headType, tailType)
 
 
 @bottle.post('/move')
@@ -147,8 +150,6 @@ def move():
     """
     # print(json.dumps(data))
 
-
-    
     directions = next_direction_options(data)
     direction = random.choice(directions)
 
