@@ -8,6 +8,36 @@ import bottle
 
 from api import ping_response, start_response, move_response, end_response
 #------------------------------------------------methods----------------------------------------------
+# -----------------------------
+# | 0 | 0 | 5 | 0 | 0 | 0 | 8 |
+# -----------------------------
+# | 0 | 1 | 1 | 1 | 0 | 0 | 0 |
+# -----------------------------
+# | 0 | 5 | 0 | 0 | 0 | 0 | 0 |
+# -----------------------------
+# | 1 | 0 | 0 | 0 | 0 | 5 | 0 |
+# -----------------------------
+# | 1 | 0 | 0 | 5 | 0 | 0 | 0 |
+# -----------------------------
+# | 1 | 1 | 0 | 0 | 0 | 1 | 0 |
+# -----------------------------
+# | 0 | 5 | 0 | 0 | 0 | 1 | 1 |
+# -----------------------------
+# 0: safe 1: danger 5:food
+def setBoard(data):
+    board_width = data['board']['width']
+    board_height = data['board']['height']
+    return 0;
+
+# 0: safe 1:danger
+def isSafe(x, y, board):
+    return board[x][y] == 1;
+
+def get_distance(x1, y1, x2, y2):
+    distance = ((x1-x2)**2)+((y1-y2)**2)
+    return distance;
+
+
 # this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
 def next_direction_options(data):
     print 'data:' , data
