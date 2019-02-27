@@ -30,6 +30,7 @@ from api import ping_response, start_response, move_response, end_response
 # 0: safe 1: danger 5:food 
 
 def setBoard(data, current_pos):
+    selfsnake = data['you']
     board_width = data['board']['width']
     board_height = data['board']['height']
     board = [[0 for x in range(board_width)] for y in range(board_height)]
@@ -45,20 +46,35 @@ def setBoard(data, current_pos):
         distance = get_distance(current_pos, food_pos)
         foodList[distance] = food_pos
 
-    # set body positions
-    snakes_bodies = get_snakes_body_positions(data['board']['snakes'])
-    for body_frag in snakes_bodies:
-        board[body_frag['y']][body_frag['x']] = 1
-        
-    # set head positions 
-    snakes_heads = get_snakes_head_positions(data['board']['snakes'])
-    for head_frag in snakes_heads:    
-        board[head_frag['y']][head_frag['x']] = 1
 
-    # set longer snakes' potential next head positions
-    longer_snake_next = get_longer_snake_next_positions(data['board']['snakes'], data['you']['id'], len(data['you']['body']), board_width)
-    for longer_snake_next_cell in longer_snake_next:
-        board[longer_snake_next_cell['y']][longer_snake_next_cell['x']] = 1
+    snakes = data['board']['snakes']
+    for snake in snakes:
+        # set body position
+        snake_body = snake['body'][1:]
+        for body_frag in snake_body:
+            board[body_frag['y']][body_frag['x']] = 1
+
+        # set head position
+        snake_head = snake['body'][0]
+        board[snake_head['y']][snake_head['x']] = 1
+
+        # reopen tail position (if there's no food around a snake's head, open its tail position)
+        snake_tail = snake['body'][-1]
+        around_cells = get_around_cells(snake_head, board_width)
+        occupied = 0
+        for each_cell in around_cells:
+            if(board[each_cell['y']][each_cell['x']]==5):
+                occupied = 1
+        if ((occupied == 0) and (len(snake['body']) >= 4)):
+            board[snake_tail['y']][snake_tail['x']] = 0
+
+        # set longer snakes' potential next head positions    (TBD)
+        snake_length = len(snake['body'])
+        self_length = len(selfsnake['body'])
+        if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
+            for each_cell in around_cells:
+                board[each_cell['y']][each_cell['x']] = 1
+
 
     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
       for row in board]))
@@ -67,51 +83,28 @@ def setBoard(data, current_pos):
     # print(board)
     return board, orderedFoodList.values()
 
-# this method will return an array of coordinates of all the snakes' bodies.
-def get_snakes_body_positions(snakes):
-    result = []
-    for snake in snakes:
-        snake_body = snake['body'][1:]
-        for body_fragment in snake_body:
-            result.append(body_fragment)
-    return result;
-
-# this method will return an array of coordinates of all the snakes' current head positions 
-def get_snakes_head_positions(snakes):
-    result = []
-    for snake in snakes:
-        snake_head_current = snake['body'][0]
-        result.append(snake_head_current)
-    return result;
-
-# this method will return an array of coordinates of longer snakes' (or same-length snakes') potential next-step head positions
-def get_longer_snake_next_positions(snakes, self_id, self_length, board_width):
-    result = []
-    for snake in snakes:
-        if(snake['id'] != self_id):
-            snake_head_current = snake['body'][0]
-            snake_length = len(snake['body'])
-            if (snake_length >= self_length):
-                cur_x = snake_head_current['x']
-                cur_y = snake_head_current['y']
-                if(cur_y-1>=0): result.append({'x':cur_x, 'y': cur_y-1})#up
-                if(cur_y+1<=board_width-1): result.append({'x':cur_x, 'y': cur_y+1})#down
-                if(cur_x+1<=board_width-1): result.append({'x':cur_x+1, 'y': cur_y})#right
-                if(cur_x-1>=0): result.append({'x':cur_x-1, 'y': cur_y})#left
-    return result;
-
+# up, down, left, right cell coordinates of a cell
+def get_around_cells(cell, board_width):
+    cells = []
+    x = cell['x']
+    y = cell['y']
+    if (y-1>=0): cells.append({'x': x, 'y': y-1}) #up
+    if (y+1<=board_width-1): cells.append({'x': x, 'y': y+1}) #down
+    if (x+1<=board_width-1): cells.append({'x': x+1, 'y': y}) #right
+    if (x-1>=0): cells.append({'x': x-1, 'y': y}) #left
+    return cells
 
 # this method will return an array of food positions. 
 def get_food_positions(data):
     return data['board']['food'];
 
-
-# this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
+# this method will return the next direction e.g. 'up'
 def next_direction(data, board, foodList, current_pos):
     # print 'data:' , data
     print 'turn: ', data['turn']
     print 'current pos: ', current_pos
-    direction = data['turn']
+    # direction = data['turn']
+    direction = 'up'
     next_pos = DFS(current_pos, foodList[0], board)
     print 'next pos: ', next_pos
     if next_pos[0]==current_pos[0]:
@@ -180,7 +173,6 @@ def move():
     board_, foodList = setBoard(data, (x,y))
     direction = next_direction(data, board_, foodList, (x,y))
     print 'next direction: ', direction
-    # print("--- %s miliseconds ---" % int(round(time.time() - start_time) * 1000))
     print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
     return move_response(direction)
 
