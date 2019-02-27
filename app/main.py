@@ -60,6 +60,7 @@ def setBoard(data, current_pos):
     #   for row in board]))
 
     orderedFoodList = OrderedDict(sorted(foodList.items()))
+    print(board)
     return board, orderedFoodList.values()
 
 # this method will return an array of coordinates of all the snakes' bodies.
@@ -106,11 +107,12 @@ def next_direction_options(data, board, foodList, current_pos):
     print 'current pos: ', current_pos
     direction = data['turn']
     next_pos = DFS(current_pos, foodList[0], board)
+    print('food', foodList[0])
     print 'next pos: ', next_pos
     if next_pos[0]==current_pos[0]:
-        direction = ('up' if next_pos[1]>current_pos[1] else 'down')
+        direction = ('up' if next_pos[1]<current_pos[1] else 'down')
     if next_pos[1]==current_pos[1]:
-        direction = ('left' if next_pos[1]>current_pos[1] else 'right')
+        direction = ('left' if next_pos[0]<current_pos[0] else 'right')
 
     return direction
 #------------------------------------------------API calls------------------------------------------------------
