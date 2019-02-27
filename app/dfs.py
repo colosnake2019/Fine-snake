@@ -10,35 +10,9 @@ def isSafe(x, y, board):
         return False
     return board[y][x] == 0 or board[y][x] == 5;
 
-#general method of getting the path
-def get_path(parent, start, end):
-    child = end 
-    path = [end]
-    if start in parent:
-        del parent[start]
-    if child in parent:
-        while parent[child]:
-            if parent[child] in path:
-                break
-            path.append(parent[child])
-            child = parent[child]
-            if child not in parent: 
-                break
-            # avoid the case 'K': 'I', 'I':'K', while loop will be infinite 
-            child_parent = parent[child]
-            if child_parent in parent:
-                if parent[child_parent] == child:
-                    if child_parent not in path:
-                        path.append(child_parent)
-                    break
-    if start != path[-1]:
-        path.append(start)
-    path.reverse()
-    return path
-
 # calculate the distance between two points
 def get_distance(start, end):
-    distance = ((start[0]-start[1])**2)+((end[0]-end[1])**2)
+    distance = ((start[0]-end[0])**2)+((start[1]-end[1])**2)
     return distance
 
 # in this method, could optimal the child list, like put them in order and check the security
@@ -89,5 +63,3 @@ def dfs_solution(current_pos, goal_state, board):
         child_list = createChild(node, goal_state, board)
         frontier.extend(child for child in child_list if child not in explored and child not in frontier)
     return False
-
-
