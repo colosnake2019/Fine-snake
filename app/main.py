@@ -44,23 +44,27 @@ def setBoard(data, current_pos):
         food_pos = (x,y)
         distance = get_distance(current_pos, food_pos)
         foodList[distance] = food_pos
+
     # set body positions
     snakes_bodies = get_snakes_body_positions(data['board']['snakes'])
     for body_frag in snakes_bodies:
         board[body_frag['y']][body_frag['x']] = 1
         
-    # set head positions and longer snakes' potential next head positions
-    snakes_heads = get_snakes_head_positions(data['board']['snakes'], data['you']['id'], len(data['you']['body']))
+    # set head positions 
+    snakes_heads = get_snakes_head_positions(data['board']['snakes'])
+    for head_frag in snakes_heads:    
+        board[head_frag['y']][head_frag['x']] = 1
 
-    for head_frag in snakes_heads:
-        if((head_frag['y']>=0) and (head_frag['y']<board_height) and (head_frag['x']>=0) and (head_frag['x']<board_width)):
-            board[head_frag['y']][head_frag['x']] = 1
+    # set longer snakes' potential next head positions
+    longer_snake_next = get_longer_snake_next_positions(data['board']['snakes'], data['you']['id'], len(data['you']['body']), board_width)
+    for longer_snake_next_cell in longer_snake_next:
+        board[longer_snake_next_cell['y']][longer_snake_next_cell['x']] = 1
 
-    # print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
-    #   for row in board]))
+    print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
+      for row in board]))
 
     orderedFoodList = OrderedDict(sorted(foodList.items()))
-    print(board)
+    # print(board)
     return board, orderedFoodList.values()
 
 # this method will return an array of coordinates of all the snakes' bodies.
@@ -72,36 +76,38 @@ def get_snakes_body_positions(snakes):
             result.append(body_fragment)
     return result;
 
-# this method will return an array of coordinates of all the other snakes' current head positions and longer snakes' potential next-step head positions
-def get_snakes_head_positions(snakes, self_id, self_length):
+# this method will return an array of coordinates of all the snakes' current head positions 
+def get_snakes_head_positions(snakes):
+    result = []
+    for snake in snakes:
+        snake_head_current = snake['body'][0]
+        result.append(snake_head_current)
+    return result;
+
+# this method will return an array of coordinates of longer snakes' (or same-length snakes') potential next-step head positions
+def get_longer_snake_next_positions(snakes, self_id, self_length, board_width):
     result = []
     for snake in snakes:
         if(snake['id'] != self_id):
             snake_head_current = snake['body'][0]
-            result.append(snake_head_current)
             snake_length = len(snake['body'])
             if (snake_length >= self_length):
-                #the longer snake's (or same-length snake) potential next-step head position
                 cur_x = snake_head_current['x']
                 cur_y = snake_head_current['y']
-                result.append({'x':cur_x, 'y': cur_y-1})#up
-                result.append({'x':cur_x, 'y': cur_y+1})#down
-                result.append({'x':cur_x+1, 'y': cur_y})#right
-                result.append({'x':cur_x-1, 'y': cur_y})#left
-        else:
-            snake_head_current = snake['body'][0]
-            result.append(snake_head_current)
-
+                if(cur_y-1>=0): result.append({'x':cur_x, 'y': cur_y-1})#up
+                if(cur_y+1<=board_width-1): result.append({'x':cur_x, 'y': cur_y+1})#down
+                if(cur_x+1<=board_width-1): result.append({'x':cur_x+1, 'y': cur_y})#right
+                if(cur_x-1>=0): result.append({'x':cur_x-1, 'y': cur_y})#left
     return result;
+
 
 # this method will return an array of food positions. 
 def get_food_positions(data):
     return data['board']['food'];
 
 
-# this method should be removed later
 # this method will get the direction options of my snake head (avoid walls, bodies, heads, and longer snakes' potential next head positions)
-def next_direction_options(data, board, foodList, current_pos):
+def next_direction(data, board, foodList, current_pos):
     # print 'data:' , data
     print 'turn: ', data['turn']
     print 'current pos: ', current_pos
@@ -168,13 +174,14 @@ def move():
     """
     # print(json.dumps(data))
     start_time = time.time()
-    print("data is "+str(data))
+    # print("data is "+str(data))
     x = data['you']['body'][0]['x']
     y = data['you']['body'][0]['y']
     board_, foodList = setBoard(data, (x,y))
-    direction = next_direction_options(data, board_, foodList, (x,y))
-    print 'get next direction: ', direction
-    print("--- %s seconds ---" % (time.time() - start_time))
+    direction = next_direction(data, board_, foodList, (x,y))
+    print 'next direction: ', direction
+    # print("--- %s miliseconds ---" % int(round(time.time() - start_time) * 1000))
+    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
     return move_response(direction)
 
 
