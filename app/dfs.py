@@ -36,15 +36,14 @@ def createChild(position, goal, board):
         next = (x,y+1)
         childList[get_distance(next, goal)] = next
 
-    sorted_children = OrderedDict(sorted(childList.items()))
-
-    # return sorted_children.values()  # [(12, 15), (12, 14), (11, 13), (13, 13)]
+    sorted_children = OrderedDict(sorted(childList.items(), reverse = True))
     return sorted_children.values()
 
+
 def DFS(current_pos, goal_state, board):
-    x = current_pos[0]
-    y = current_pos[1]
-    childrenStates = createChild((x,y), goal_state, board)
+    print 'goal_state', goal_state
+    childrenStates = createChild(current_pos, goal_state, board)
+    childrenStates = childrenStates[::-1]
     print 'in DFS, DFS is ', childrenStates
     for child in childrenStates: 
         if dfs_solution(child, goal_state, board):
@@ -53,6 +52,7 @@ def DFS(current_pos, goal_state, board):
 
 def dfs_solution(current_pos, goal_state, board):
     frontier = createChild(current_pos, goal_state, board)
+    frontier.append(current_pos)
     explored = []
     explored.append(current_pos)
     while frontier:
