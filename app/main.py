@@ -174,8 +174,7 @@ def move():
     direction = next_direction_options(data, board_, foodList, (x,y))
     print 'get next direction: ', direction
     print("--- %s seconds ---" % (time.time() - start_time))
-    # return move_response(direction)
-    return direction
+    return move_response(direction)
 
 
 @bottle.post('/end')
