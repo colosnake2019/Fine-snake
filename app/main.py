@@ -58,7 +58,7 @@ def setBoard(data, current_pos):
         snake_head = snake['body'][0]
         board[snake_head['y']][snake_head['x']] = 1
 
-        # reopen tail position (if there's no food around a snake's head, open its tail position)
+        # reopen tail position (if there's no food around a snake's head, open its tail position) (if it eat a food at this step, skip this step)
         snake_tail = snake['body'][-1]
         around_cells = get_around_cells(snake_head, board_width)
         occupied = 0
@@ -117,16 +117,16 @@ def next_direction(data, board, destination, current_pos):
     return direction
 
 # pick a random safe direction(-------TODO-------)
-def hover(board, head, board_width):
-    direction = 'up'
-    cells = get_around_cells({'x': head[0], 'y': head[1]}, board_width)
-    for cell in cells:
-        if (board[cell['y']][cell['x']] != 1):
-            if cell['x']==head[0]:
-                direction = ('up' if cell['y']<head[1] else 'down')
-            if cell['y']==head[1]:
-                direction = ('left' if cell['x']<head[0] else 'right')
-    return direction
+# def hover(board, head, board_width):
+#     direction = 'up'
+#     cells = get_around_cells({'x': head[0], 'y': head[1]}, board_width)
+#     for cell in cells:
+#         if (board[cell['y']][cell['x']] != 1):
+#             if cell['x']==head[0]:
+#                 direction = ('up' if cell['y']<head[1] else 'down')
+#             if cell['y']==head[1]:
+#                 direction = ('left' if cell['x']<head[0] else 'right')
+#     return direction
 
 
 #------------------------------------------------API calls------------------------------------------------------
@@ -180,10 +180,8 @@ def move():
     """
 
     Stratege:
-        if just had a food (100 health)
-            pick a random safe direction (TODO need to be modified)
 
-        if health>=80 
+        if health>=80 and health<100
             chase the tail
         
         else
@@ -213,16 +211,9 @@ def move():
 
     health = data['you']['health']
 
-    # had a food at this step, do not chase the tail (find longest path to the tail) (------TODO-------)
-    if ((health == 100) and len(data['you']['body'])>=4):
-        print('!!=============HOVER==============!!')
-        direction = hover(board_, head, data['board']['width'])
-        print 'next direction: ', direction
-        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-        return move_response(direction)
 
-    # if (health>=80):
-    if (health>=80):
+
+    if ((health>=80) and (health<100)):
         # chasing the tail     (---------TODO----------if there's no path to the tail...) 
         print('!!=============TAIL==============!!')  
         direction = next_direction(data, board_, tail, head)
@@ -233,6 +224,7 @@ def move():
         # chasing the food in sequence
         print('!!=============FOOD==============!!')
         for food in foodList:    
+            #(-------------TODO------------ check food position and other snakes' position relationship)
             direction_head_to_food = next_direction(data, board_, food, head)
             # if there's a path from head to food
             if (direction_head_to_food is not None):
@@ -244,7 +236,8 @@ def move():
                     print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
                     return move_response(direction)
                     
-        # no path find for all of the food (----------TODO-----------)            
+        # no path find for all of the food (----------TODO-----------)   
+        print('!!=============NO FOOD!! TAIL==============!!')         
         direction = next_direction(data, board_, tail, head)
         print 'next direction: ', direction
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
