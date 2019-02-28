@@ -59,16 +59,10 @@ def setBoard(data, current_pos):
         snake_head = snake['body'][0]
         board[snake_head['y']][snake_head['x']] = 1
 
-        # reopen tail position (if there's no food around a snake's head, and it didnt eat at this step, reopen its tail position)
-        if(snake['health']!=100):
+        # reopen tail position (if the snake didnt eat at this step, reopen its tail position)
+        if((snake['health']!=100) and (snake['body'][-1]!=snake['body'][-2])):
             snake_tail = snake['body'][-1]
-            around_cells = get_around_cells(snake_head, board_width)
-            occupied = 0
-            for each_cell in around_cells:
-                if(board[each_cell['y']][each_cell['x']]==5):
-                    occupied = 1
-            if ((occupied == 0) and (len(snake['body']) >= 4)):
-                board[snake_tail['y']][snake_tail['x']] = 0
+            board[snake_tail['y']][snake_tail['x']] = 0
 
         # set longer snakes' potential next head positions    (TBD)
         snake_length = len(snake['body'])
@@ -166,27 +160,6 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-
-    """
-
-    Stratege:
-
-        if health>=80 and health<100
-            chase the tail
-        
-        else
-            look for each food (closest to farthest)
-                if there's a path from head to food, and a path from food to tail (perfect!) 
-                    return direction
-                else
-                    continue the for loop
-            
-            all food has been visited, and no safe food can be found
-                chase tail(TODO need to be modified)
-
-    """
-
-
     direction = 'up' #initialize a direction
 
     # draw the board
@@ -201,21 +174,46 @@ def move():
 
     health = data['you']['health']
 
+    # at the beginning of the game, chase food and increase length to 5
+    if (len(data['you']['body'])<=5):
+        print('!!=============LENGTH<=5 CHASE FOOD==============!!')
+        for food in foodList:    
+            direction_head_to_food = next_direction(data, board_, food, head)
+            if (direction_head_to_food is not None):
+                direction = direction_head_to_food
+                print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+                return move_response(direction)
+
     #(---------TODO----------if eat a food at this step, DFS to tail doesnt work) 
     if (health == 100):
-        return None;
+        print('!!=============CHASE FOOD==============!!')
+        for food in foodList:    
+            direction_head_to_food = next_direction(data, board_, food, head)
+            if (direction_head_to_food is not None):
+                direction = direction_head_to_food
+                print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+                return move_response(direction)
 
 
-    if ((health>=80) and (health<100)):
-        # chasing the tail     (---------TODO----------if there's no path to the tail...) 
-        print('!!=============TAIL==============!!')  
+    if (health>=80):
+        # chasing the tail 
+        print('!!=============CHASE TAIL==============!!')  
         direction = next_direction(data, board_, tail, head)
+        # (------------TODO------------- if there's no path to the tail)
+        if (direction is None): 
+            print('!!=============NO PATH TO TAIL, CHASE FOOD==============!!')  
+            for food in foodList:    
+                direction_head_to_food = next_direction(data, board_, food, head)
+                if (direction_head_to_food is not None):
+                    direction = direction_head_to_food
+                    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+                    return move_response(direction)
         print 'next direction: ', direction
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
     else:
         # chasing the food in sequence
-        print('!!=============FOOD==============!!')
+        print('!!=============CHASE FOOD==============!!')
         for food in foodList:    
             #(-------------TODO------------ check food position and other snakes' position relationship)
             direction_head_to_food = next_direction(data, board_, food, head)
