@@ -45,6 +45,8 @@ def DFS(current_pos, goal_state, board):
     childrenStates = createChild(current_pos, goal_state, board)
     childrenStates = childrenStates[::-1]
     print 'in DFS, DFS is ', childrenStates
+    if (len(childrenStates)==0):
+        return None
     for child in childrenStates: 
         if dfs_solution(child, goal_state, board):
             return child
