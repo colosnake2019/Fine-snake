@@ -99,13 +99,15 @@ def get_food_positions(data):
     return data['board']['food'];
 
 # this method will return the next direction e.g. 'up'
-def next_direction(data, board, foodList, current_pos):
+def next_direction(data, board, destination, current_pos):
     # print 'data:' , data
     print 'turn: ', data['turn']
     print 'current pos: ', current_pos
     # direction = data['turn']
     direction = 'up'
-    next_pos = DFS(current_pos, foodList[0], board)
+    next_pos = DFS(current_pos, destination, board)
+    if(next_pos is None):
+        return None
     print 'next pos: ', next_pos
     if next_pos[0]==current_pos[0]:
         direction = ('up' if next_pos[1]<current_pos[1] else 'down')
@@ -113,6 +115,20 @@ def next_direction(data, board, foodList, current_pos):
         direction = ('left' if next_pos[0]<current_pos[0] else 'right')
 
     return direction
+
+# pick a random safe direction(-------TODO-------)
+def hover(board, head, board_width):
+    direction = 'up'
+    cells = get_around_cells({'x': head[0], 'y': head[1]}, board_width)
+    for cell in cells:
+        if (board[cell['y']][cell['x']] != 1):
+            if cell['x']==head[0]:
+                direction = ('up' if cell['y']<head[1] else 'down')
+            if cell['y']==head[1]:
+                direction = ('left' if cell['x']<head[0] else 'right')
+    return direction
+
+
 #------------------------------------------------API calls------------------------------------------------------
 @bottle.route('/')
 def index():
@@ -162,19 +178,77 @@ def move():
     data = bottle.request.json
 
     """
-    TODO: Using the data from the endpoint request object, your
-            snake AI must choose a direction to move in.
+
+    Stratege:
+        if just had a food (100 health)
+            pick a random safe direction (TODO need to be modified)
+
+        if health>=80 
+            chase the tail
+        
+        else
+            look for each food (closest to farthest)
+                if there's a path from head to food, and a path from food to tail (perfect!) 
+                    return direction
+                else
+                    continue the for loop
+            
+            all food has been visited, and no safe food can be found
+                chase tail(TODO need to be modified)
+
     """
-    # print(json.dumps(data))
+
+
+    direction = 'up' #initialize a direction
+
+    # draw the board
     start_time = time.time()
-    # print("data is "+str(data))
     x = data['you']['body'][0]['x']
     y = data['you']['body'][0]['y']
-    board_, foodList = setBoard(data, (x,y))
-    direction = next_direction(data, board_, foodList, (x,y))
-    print 'next direction: ', direction
-    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-    return move_response(direction)
+    head = (x,y)
+    tail_pos_x = data['you']['body'][-1]['x']
+    tail_pos_y = data['you']['body'][-1]['y']
+    tail = (tail_pos_x, tail_pos_y)
+    board_, foodList = setBoard(data, head)
+
+    health = data['you']['health']
+
+    # had a food at this step, do not chase the tail (find longest path to the tail) (------TODO-------)
+    if ((health == 100) and len(data['you']['body'])>=4):
+        print('!!=============HOVER==============!!')
+        direction = hover(board_, head, data['board']['width'])
+        print 'next direction: ', direction
+        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+        return move_response(direction)
+
+    # if (health>=80):
+    if (health>=80):
+        # chasing the tail     (---------TODO----------if there's no path to the tail...) 
+        print('!!=============TAIL==============!!')  
+        direction = next_direction(data, board_, tail, head)
+        print 'next direction: ', direction
+        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+        return move_response(direction)
+    else:
+        # chasing the food in sequence
+        print('!!=============FOOD==============!!')
+        for food in foodList:    
+            direction_head_to_food = next_direction(data, board_, food, head)
+            # if there's a path from head to food
+            if (direction_head_to_food is not None):
+                direction_food_to_tail = next_direction(data, board_, tail, food)
+                # if there's a path from the food to tail
+                if (direction_food_to_tail is not None):
+                    direction = direction_head_to_food
+                    print 'next direction: ', direction
+                    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+                    return move_response(direction)
+                    
+        # no path find for all of the food (----------TODO-----------)            
+        direction = next_direction(data, board_, tail, head)
+        print 'next direction: ', direction
+        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+        return move_response(direction)
 
 
 @bottle.post('/end')
