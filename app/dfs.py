@@ -43,17 +43,17 @@ def createChild(position, goal, board):
 
 
 def DFS(current_pos, goal_state, board):
-    print 'goal_state', goal_state
+    print ('goal_state', goal_state)
     childrenStates = createChild(current_pos, goal_state, board)
     childrenStates = childrenStates[::-1]
     for child in childrenStates: 
         if dfs_solution(child, goal_state, board):
             # if path exists, return the next direction
-            print 'path exist from ', current_pos, ' to ', goal_state
+            print ('path exist from ', current_pos, ' to ', goal_state)
             return child
     # if path doesn't exist, return None
     # return childrenStates[0]
-    print 'no path from ', current_pos, ' to ', goal_state
+    print ('no path from ', current_pos, ' to ', goal_state)
     return None
 
 def dfs_solution(current_pos, goal_state, board):
