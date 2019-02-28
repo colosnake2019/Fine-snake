@@ -3,11 +3,13 @@ from collections import OrderedDict
 
 
 # 0/5: safe 1:danger
-def isSafe(x, y, board):
+def isSafe(x, y, board, goal):
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
+    if (x,y) == goal:
+        return True
     return board[y][x] == 0 or board[y][x] == 5;
 
 # calculate the distance between two points
@@ -23,16 +25,16 @@ def createChild(position, goal, board):
     x = position[0]
     y = position[1]
 
-    if isSafe(x-1, y, board):
+    if isSafe(x-1, y, board, goal):
         next = (x-1,y)
         childList[get_distance(next, goal)] = next
-    if isSafe(x+1, y, board):
+    if isSafe(x+1, y, board, goal):
         next = (x+1,y)
         childList[get_distance(next, goal)] = next
-    if isSafe(x, y-1, board):
+    if isSafe(x, y-1, board, goal):
         next = (x,y-1)
         childList[get_distance(next, goal)] = next
-    if isSafe(x, y+1, board):
+    if isSafe(x, y+1, board, goal):
         next = (x,y+1)
         childList[get_distance(next, goal)] = next
 

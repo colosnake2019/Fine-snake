@@ -112,6 +112,36 @@ def next_direction(data, board, destination, current_pos):
 
     return direction
 
+def chaseFood(foodList, data, board_, head, tail, flag):
+    for food in foodList:    
+        direction_head_to_food = next_direction(data, board_, food, head)
+        if direction_head_to_food is not None: # check there is path from head to food
+            # if flag == 1 means the game just start, no need to test path from food to tail
+            if flag == 1 or next_direction(data, board_, tail, food) is not None: # check there is path from food to tail
+                return direction_head_to_food
+    return None
+
+def safeCheck(x, y, board):
+    if y<0 or y>(len(board)-1):
+        return False
+    if x<0 or x>(len(board[0])-1):
+        return False
+    return board[y][x] == 0 or board[y][x] == 5;
+
+def finalChoice(position, board):
+    x = position[0]
+    y = position[1]
+
+    if safeCheck(x-1, y, board):
+        return (x-1,y)
+    if safeCheck(x+1, y, board):
+        return (x+1,y)
+    if safeCheck(x, y-1, board):
+        return (x,y-1)
+    if safeCheck(x, y+1, board, goal):
+        return (x,y+1)
+    # no way to go, then whatever
+    return (x-1,y)
 
 #------------------------------------------------API calls------------------------------------------------------
 @bottle.route('/')
@@ -177,63 +207,50 @@ def move():
     # at the beginning of the game, chase food and increase length to 5
     if (len(data['you']['body'])<=5):
         print('!!=============LENGTH<=5 CHASE FOOD==============!!')
-        for food in foodList:    
-            direction_head_to_food = next_direction(data, board_, food, head)
-            if (direction_head_to_food is not None):
-                direction = direction_head_to_food
-                print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-                return move_response(direction)
+        direction = chaseFood(foodList, data, board_, head, tail, 1)
+        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+        return move_response(direction)
 
     #(---------TODO----------if eat a food at this step, DFS to tail doesnt work) 
     if (health == 100):
         print('!!=============CHASE FOOD==============!!')
-        for food in foodList:    
-            direction_head_to_food = next_direction(data, board_, food, head)
-            if (direction_head_to_food is not None):
-                direction = direction_head_to_food
-                print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-                return move_response(direction)
+        direction = chaseFood(foodList, data, board_, head, tail, 0)
+        if direction is None:
+            print('!!=========HEALTH FULL, NO PATH TO FOOD, FINAL==============!!')
+            direction = finalChoice(head, board_)
+        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+        return move_response(direction)
 
-
-    if (health>=80):
-        # chasing the tail 
-        print('!!=============CHASE TAIL==============!!')  
+    if (health>=80): # chasing the tail 
+        print('!!==========Health>=80, CHASE TAIL==============!!')  
         direction = next_direction(data, board_, tail, head)
         # (------------TODO------------- if there's no path to the tail)
-        if (direction is None): 
-            print('!!=============NO PATH TO TAIL, CHASE FOOD==============!!')  
-            for food in foodList:    
-                direction_head_to_food = next_direction(data, board_, food, head)
-                if (direction_head_to_food is not None):
-                    direction = direction_head_to_food
-                    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-                    return move_response(direction)
+        if direction is None:
+            print('!!=============Health>=80, NO PATH TO TAIL, CHASE FOOD==============!!')  
+            direction = chaseFood(foodList, data, board_, head, tail, 0)
+        if direction is None:
+            print('!!=============Health>=80, NO PATH TO TAIL, NO PATH TO FOOD, FINAL==========!!')
+            direction = finalChoice(head, board_)
         print 'next direction: ', direction
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
     else:
         # chasing the food in sequence
-        print('!!=============CHASE FOOD==============!!')
-        for food in foodList:    
-            #(-------------TODO------------ check food position and other snakes' position relationship)
-            direction_head_to_food = next_direction(data, board_, food, head)
-            # if there's a path from head to food
-            if (direction_head_to_food is not None):
-                direction_food_to_tail = next_direction(data, board_, tail, food)
-                # if there's a path from the food to tail
-                if (direction_food_to_tail is not None):
-                    direction = direction_head_to_food
-                    print 'next direction: ', direction
-                    print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-                    return move_response(direction)
+        print('!!============Health<80 CHASE FOOD==============!!')
+        direction = chaseFood(foodList, data, board_, head, tail, 0)
+        if direction is not None:
+            print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+            return move_response(direction)
                     
         # no path find for all of the food (----------TODO-----------)   
         print('!!=============NO FOOD!! GO TAIL==============!!')         
         direction = next_direction(data, board_, tail, head)
+        if direction is None:
+            print('!!=============NO FOOD!! NO TO TAIL, FINAL==============!!')
+            direction = finalChoice(head, board_)
         print 'next direction: ', direction
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
-
 
 @bottle.post('/end')
 def end():
@@ -257,7 +274,6 @@ if __name__ == '__main__':
         port=os.getenv('PORT', '8080'),
         debug=os.getenv('DEBUG', True)
     )
-
 
 
 
