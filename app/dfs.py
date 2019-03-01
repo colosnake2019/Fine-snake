@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 # 0/5: safe 1:danger
 def isSafe(x, y, board, goal):
-    safe = [0, 5, 2, 3]
+    # safe = [0, 5, 2, 3]
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
@@ -11,7 +11,7 @@ def isSafe(x, y, board, goal):
     if (x,y) == goal and get_distance(goal, cur_pos) > 1:
         print('goal tail is 1')
         return True
-    return board[y][x] in safe;
+    return (board[y][x] == 1 or board[y][x] == 0);
 
 # calculate the distance between two points
 def get_distance(start, end):
@@ -28,19 +28,22 @@ def createChild(position, goal, board):
 
     if isSafe(x-1, y, board, goal):
         next = (x-1,y)
-        childList[get_distance(next, goal)] = next
+        childList[next] = (board[y][x-1], get_distance(next, goal))
     if isSafe(x+1, y, board, goal):
         next = (x+1,y)
-        childList[get_distance(next, goal)] = next
+        childList[next] = (board[y][x+1], get_distance(next, goal))
     if isSafe(x, y-1, board, goal):
         next = (x,y-1)
-        childList[get_distance(next, goal)] = next
+        childList[next] = (board[y-1][x], get_distance(next, goal))
     if isSafe(x, y+1, board, goal):
         next = (x,y+1)
-        childList[get_distance(next, goal)] = next
+        childList[next] = (board[y+1][x], get_distance(next, goal))
 
-    sorted_children = OrderedDict(sorted(childList.items(), reverse = True))
-    return sorted_children.values()
+    # sorted_children = OrderedDict(sorted(childList.items(), reverse = True))
+    sorted_children = OrderedDict(sorted(childList.items(), key=lambda kv: kv[1], reverse = True))
+#    print('sorted_children', sorted_children)
+    print('sorted_children.keys()', sorted_children.keys())
+    return sorted_children.keys()
 
 
 def DFS(current_pos, goal_state, board):
@@ -73,5 +76,6 @@ def dfs_solution(current_pos, goal_state, board):
             return True
         child_list = createChild(node, goal_state, board)
         frontier.extend(child for child in child_list if child not in trackExplored and child not in frontier)
-    print(explored)
+        #print('frontier', frontier)
+    #print('explored', explored)
     return False
