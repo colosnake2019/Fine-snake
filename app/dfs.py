@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 # 0/5: safe 1:danger
 def isSafe(x, y, board, goal):
+    safe = [0, 5, 2, 3]
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
@@ -10,7 +11,7 @@ def isSafe(x, y, board, goal):
     if (x,y) == goal and get_distance(goal, cur_pos) > 1:
         print('goal tail is 1')
         return True
-    return board[y][x] == 0 or board[y][x] == 5;
+    return board[y][x] in safe;
 
 # calculate the distance between two points
 def get_distance(start, end):

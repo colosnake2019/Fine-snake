@@ -63,13 +63,21 @@ def setBoard(data, current_pos):
             snake_tail = snake['body'][-1]
             board[snake_tail['y']][snake_tail['x']] = 0
 
-        # set longer snakes' potential next head positions    (TBD)
+        # (----------------TODO-------------------)
+        # set longer snakes' potential next head positions    
         snake_length = len(snake['body'])
         self_length = len(selfsnake['body'])
         if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
-            around_cells = get_around_cells(snake['body'][0], board_width)
-            for each_cell in around_cells:
-                board[each_cell['y']][each_cell['x']] = 1
+            around_cells_1 = get_around_cells(snake['body'][0], board_width)
+            for each_cell_1 in around_cells_1:
+                cell = board[each_cell_1['y']][each_cell_1['x']]
+                if (cell==0 or cell==5):
+                    board[each_cell_1['y']][each_cell_1['x']] = 2 # next 1 step
+                around_cells_2 = get_around_cells(each_cell_1, board_width)
+                for each_cell_2 in around_cells_2:
+                    cell =  board[each_cell_2['y']][each_cell_2['x']]
+                    if(cell==0 or cell==5):
+                        board[each_cell_2['y']][each_cell_2['x']] = 3 # next 2 step
 
 
     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
@@ -114,14 +122,16 @@ def next_direction(data, board, destination, current_pos):
 
 def chaseFood(foodList, data, board_, head, tail, flag):
     close_food = []
-    for food in foodList:
-        if (get_distance(head, food) <= 55):
-            direction_head_to_food = next_direction(data, board_, food, head)
-            if direction_head_to_food is not None: # check there is path from head to food
-                # if flag == 1 means the game just start, no need to test path from food to tail
-                if flag == 1 or get_distance(tail, food) > 125 or next_direction(data, board_, tail, food) is not None: # check there is path from food to tail
-                    print('There is path from food ', food, 'to tail')
-                    return direction_head_to_food
+    food_sub_list = foodList
+    if (len(foodList)>=4):
+        food_sub_list = foodList[0:4]
+    for food in food_sub_list:
+        direction_head_to_food = next_direction(data, board_, food, head)
+        if direction_head_to_food is not None: # check there is path from head to food
+            # if flag == 1 means the game just start, no need to test path from food to tail
+            if (flag == 1) or (get_distance(tail, food) > 125) or (next_direction(data, board_, tail, food) is not None): # check there is path from food to tail
+                print('There is path from food ', food, 'to tail')
+                return direction_head_to_food
     return None
 
 
@@ -132,6 +142,7 @@ def safeCheck(x, y, board):
         return False
     return board[y][x] == 0 or board[y][x] == 5;
 
+# (-----------TODO---------------)
 def finalChoice(position, board):
     x = position[0]
     y = position[1]
@@ -190,7 +201,7 @@ def start():
     """
     # print(json.dumps(data))
 
-    color = "#FF69B4"
+    color = "#e6e600"
     headType = "silly"
     tailType = "bolt"
 
