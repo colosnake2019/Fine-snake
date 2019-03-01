@@ -67,7 +67,7 @@ def setBoard(data, current_pos):
         snake_length = len(snake['body'])
         self_length = len(selfsnake['body'])
         if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
-            around_cells = get_around_cells(snake['body'][0])
+            around_cells = get_around_cells(snake['body'][0], board_width)
             for each_cell in around_cells:
                 board[each_cell['y']][each_cell['x']] = 1
 
