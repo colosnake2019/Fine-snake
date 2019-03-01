@@ -13,21 +13,21 @@ from api import ping_response, start_response, move_response, end_response
 #------------------------------------------------methods----------------------------------------------
 
 # -----------------------------
-# | 0 | 0 | 1 | 0 | 0 | 0 | 0 |
+# | 0 | 0 | -1 | 0 | 0 | 0 | 0 |
 # -----------------------------
 # | 0 | 4 | 4 | 4 | 0 | 0 | 0 |
 # -----------------------------
-# | 0 | 1 | 0 | 0 | 0 | 0 | 0 |
+# | 0 | -1 | 0 | 0 | 0 | 0 | 0 |
 # -----------------------------
-# | 4 | 0 | 0 | 0 | 0 | 1 | 0 |
+# | 4 | 0 | 0 | 0 | 0 | -1 | 0 |
 # -----------------------------
-# | 4 | 0 | 0 | 1 | 0 | 0 | 0 |
+# | 4 | 0 | 0 | -1 | 0 | 0 | 0 |
 # -----------------------------
 # | 4 | 4 | 0 | 0 | 0 | 4 | 0 |
 # -----------------------------
-# | 0 | 1 | 0 | 0 | 0 | 4 | 4 |
+# | 0 | -1 | 0 | 0 | 0 | 4 | 4 |
 # -----------------------------
-# 0: safe, 1: food, 2: position will be reached in 2 steps, 3: in 1 step, 4:dangerous 
+# 0: food, 0: safe, 2: position will be reached in 2 steps, 3: in 1 step, 4:dangerous 
 
 def setBoard(data, current_pos):
     selfsnake = data['you']
@@ -41,7 +41,7 @@ def setBoard(data, current_pos):
     for each_food in food:
         y = each_food['y']
         x = each_food['x']
-        board[y][x] = 1
+        board[y][x] = 0
         food_pos = (x,y)
         distance = get_distance(current_pos, food_pos)
         foodList[distance] = food_pos
@@ -71,12 +71,12 @@ def setBoard(data, current_pos):
             around_cells_1 = get_around_cells(snake['body'][0], board_width)
             for each_cell_1 in around_cells_1:
                 cell = board[each_cell_1['y']][each_cell_1['x']]
-                if (cell==0 or cell==1):
+                if (cell==0): #or cell==-1
                     board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
                 around_cells_2 = get_around_cells(each_cell_1, board_width)
                 for each_cell_2 in around_cells_2:
                     cell =  board[each_cell_2['y']][each_cell_2['x']]
-                    if(cell==0 or cell==1):
+                    if(cell==0): #or cell==-1
                         board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
 
@@ -141,7 +141,7 @@ def safeCheck(x, y, board):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    return board[y][x] == 0 or board[y][x] == 1;
+    return board[y][x] == 0 # or board[y][x] == -1
 
 # (-----------TODO---------------)
 def finalChoice(position, board):
@@ -225,8 +225,6 @@ def move():
     board_, foodList = setBoard(data, head)
 
     health = data['you']['health']
-
-    #return move_response(chaseFood(foodList, data, board_, head, tail, 1))
 
     # at the beginning of the game, chase food and increase length to 5
     if (len(data['you']['body'])<=5):
