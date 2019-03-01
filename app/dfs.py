@@ -65,7 +65,7 @@ def dfs_solution(current_pos, goal_state, board):
     trackExplored[current_pos] = 0
     while frontier:
         node = frontier.pop()
-        if node not in explored:
+        if node not in trackExplored:
             explored.append(node)
             trackExplored[node] = 0
         if node == goal_state:
