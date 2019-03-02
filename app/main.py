@@ -100,12 +100,12 @@ def setBoard(data, current_pos):
             around_cells_1 = get_around_cells(snake['body'][0], board_width)
             for each_cell_1 in around_cells_1:
                 cell = board[each_cell_1['y']][each_cell_1['x']]
-                if (cell<3):
+                if (cell == 0 or cell == 2):
                     board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
                 around_cells_2 = get_around_cells(each_cell_1, board_width)
                 for each_cell_2 in around_cells_2:
                     cell =  board[each_cell_2['y']][each_cell_2['x']]
-                    if(cell<2):
+                    if(cell == 0):
                         board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
     foodScores = {}
