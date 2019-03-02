@@ -3,15 +3,13 @@ from collections import OrderedDict
 
 # 0/5: safe 1:danger
 def isSafe(x, y, board, goal):
-    # safe = [0, 5, 2, 3]
+    safe = [0, 2, 3]
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
-        return False
-    if (x,y) == goal and get_distance(goal, cur_pos) > 2 and board[y][x] != 3:
-        print('goal tail is 1')
-        return True
-    return board[y][x] != 4 #or board[y][x] == 0
+        return False    
+
+    return (board[y][x] in safe)  #or board[y][x] == 0
 
 # calculate the distance between two points
 def get_distance(start, end):
@@ -28,23 +26,15 @@ def createChild(position, goal, board):
 
     if isSafe(x-1, y, board, goal):
         next = (x-1,y)
-        if next == goal:
-            return [next]
         childList[next] = (board[y][x-1], get_distance(next, goal))
     if isSafe(x+1, y, board, goal):
         next = (x+1,y)
-        if next == goal:
-            return [next]
         childList[next] = (board[y][x+1], get_distance(next, goal))
     if isSafe(x, y-1, board, goal):
         next = (x,y-1)
-        if next == goal:
-            return [next]
         childList[next] = (board[y-1][x], get_distance(next, goal))
     if isSafe(x, y+1, board, goal):
         next = (x,y+1)
-        if next == goal:
-            return [next]
         childList[next] = (board[y+1][x], get_distance(next, goal))
 
     # sorted_children = OrderedDict(sorted(childList.items(), reverse = True))
@@ -58,9 +48,9 @@ def DFS(current_pos, goal_state, board):
     print ('goal_state', goal_state)
     childrenStates = createChild(current_pos, goal_state, board)
     childrenStates = childrenStates[::-1]
-    if board[goal_state[0]][goal_state[1]] == 3:
+    if board[goal_state[0]][goal_state[1]] == 3: # if goal_state safe check is 3, don't go
         return None
-    for child in childrenStates: 
+    for child in childrenStates:
         if dfs_solution(child, goal_state, board):
             print ('path exist from ', current_pos, ' to ', goal_state)
             return child
@@ -81,6 +71,7 @@ def dfs_solution(current_pos, goal_state, board):
             explored.append(node)
             trackExplored[node] = 0
         if node == goal_state:
+            print('explored', explored)
             return True
         child_list = createChild(node, goal_state, board)
         frontier.extend(child for child in child_list if child not in trackExplored and child not in frontier)

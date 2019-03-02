@@ -108,13 +108,12 @@ def setBoard(data, current_pos):
                         if(cell==0): #or cell==-1
                             board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
-    
-    foodScores = {}
-    for each_food in foodList.keys():
-        score = getFoodScore(each_food[0], each_food[1], board)
-        foodScores[each_food] = (score, foodList[each_food])
+    # foodScores = {}
+    # for each_food in foodList.keys():
+    #     score = getFoodScore(each_food[0], each_food[1], board)
+    #     foodScores[each_food] = (score, foodList[each_food])
 
-    foodOrderValues = OrderedDict(sorted(foodScores.items(), key=lambda kv: kv[1]))
+    foodOrderValues = OrderedDict(sorted(foodList.items(), key=lambda kv: kv[1]))
     
     # print(board)
     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
@@ -142,6 +141,7 @@ def next_direction(data, board, destination, current_pos):
     print ('turn: ', data['turn'])
     print ('current pos: ', current_pos)
     # direction = data['turn']
+    health = data['you']['health']
     direction = 'up'
     next_pos = DFS(current_pos, destination, board)
     if(next_pos is None):
@@ -157,8 +157,8 @@ def next_direction(data, board, destination, current_pos):
 def chaseFood(foodList, data, board_, head, tail, flag):
     close_food = []
     food_sub_list = foodList
-    # if (len(foodList)>=4):
-    #     food_sub_list = foodList[0:4]
+    if (len(foodList)>=4):
+        food_sub_list = foodList[0:4]
     for food in food_sub_list:
         direction_head_to_food = next_direction(data, board_, food, head)
         if direction_head_to_food is not None: # check there is path from head to food
@@ -257,14 +257,14 @@ def move():
     tail_pos_y = data['you']['body'][-1]['y']
     tail = (tail_pos_x, tail_pos_y)
     board_, foodList = setBoard(data, head)
-    board_[y][x] = 0
+    
 
     health = data['you']['health']
     print ('health:', health)
 
     # at the beginning of the game, chase food and increase length to 5
-    if (len(data['you']['body'])<=5):
-        print('!!=============LENGTH<=5 CHASE FOOD==============!!')
+    if (len(data['you']['body'])<=10):
+        print('!!=============LENGTH<=10 CHASE FOOD==============!!')
         direction = chaseFood(foodList, data, board_, head, tail, 1)
         if direction is None:
             direction = finalChoice(head, board_)
@@ -275,9 +275,12 @@ def move():
 
     #(---------TODO---------- if eat a food at this step, DFS to tail doesnt work, so chase tail around) 
     if (health == 100):
-        print('!!========HEALTH FULL, CHASE TAIL==============!!') 
-        direction = next_direction(data, board_, tail, head)
-        if direction is None:
+        direction = None
+        if(get_distance(head, tail) > 1):
+            print('!!========HEALTH FULL, CHASE TAIL==============!!')
+            board_[tail[1]][tail[0]] = 0
+            direction = next_direction(data, board_, tail, head)
+        else:
             print('!!=============CHASE FOOD==============!!') 
             direction = chaseFood(foodList, data, board_, head, tail, 0)
         if direction is None:
@@ -311,8 +314,9 @@ def move():
             return move_response(direction)
                     
         # no path find for all of the food (----------TODO-----------)   
-        print('!!=============NO FOOD!! GO TAIL==============!!')         
-        direction = next_direction(data, board_, tail, head)
+        print('!!=============NO FOOD!! GO TAIL==============!!')   
+        if direction is None:    
+            direction = next_direction(data, board_, tail, head)
         if direction is None:
             print('!!=============NO FOOD!! NO TO TAIL, FINAL==============!!')
             direction = finalChoice(head, board_)
