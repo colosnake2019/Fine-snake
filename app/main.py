@@ -319,10 +319,10 @@ def move():
         if(get_distance(head, tail) > 1):
             print('!!========HEALTH FULL, CHASE TAIL==============!!')
             board_[tail[1]][tail[0]] = 0
-            direction = next_direction(data, board_, tail, head, 'A')
+            direction = next_direction(data, board_, tail, head, 'B')
         else:
             print('!!=============CHASE FOOD==============!!') 
-            direction = chaseFood(foodList, data, board_, head, tail, 0, 'A')
+            direction = chaseFood(foodList, data, board_, head, tail, 0, 'B')
         if direction is None:
             print('!!=========HEALTH FULL, NO PATH TO FOOD, FINAL==============!!')
             direction = finalChoice(head, board_)
@@ -350,10 +350,10 @@ def move():
             if health > 90:
                 #chase tail
                 print('!!==========SNAKES >4, Health>90, CHASE TAIL==============!!') 
-                direction = next_direction(data, board_, tail, head, 'A')
+                direction = next_direction(data, board_, tail, head, 'B')
                 if direction is None:
                     print 'no path to tail'
-                    direction = chaseFood(foodList, data, board_, head, tail, 0, 'A') # chase food 
+                    direction = chaseFood(foodList, data, board_, head, tail, 0, 'B') # chase food 
                 if direction is None:
                     direction = finalChoice(head, board_)
                 print ('next direction: ', direction)
@@ -388,10 +388,10 @@ def move():
             if health > 80:
                 #chase tail
                 print('!!==========SNAKES <=4, Health>80, CHASE TAIL==============!!') 
-                direction = next_direction(data, board_, tail, head, 'A')
+                direction = next_direction(data, board_, tail, head, 'B')
                 if direction is None:
                     print 'no path to tail'
-                    direction = chaseFood(foodList, data, board_, head, tail, 0, 'A') # chase food 
+                    direction = chaseFood(foodList, data, board_, head, tail, 0, 'B') # chase food 
                 if direction is None:
                     direction = finalChoice(head, board_)
                 print ('next direction: ', direction)
