@@ -282,13 +282,13 @@ def move():
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
 
-    if (health>=70): # chasing the tail 
+    if (health>=90): # chasing the tail 
         print('!!==========Health>=70, CHASE TAIL==============!!') 
-        print("health",health) 
+        print("health",health)
         direction = next_direction(data, board_, tail, head)
-        # (------------TODO------------- if there's no path to the tail)
+        # (------------TODO------------- if there's no path to the tail or tail is dangerous)
         if direction is None:
-            print('!!=============Health>=70, NO PATH TO TAIL, CHASE FOOD=========!!')
+            print('!!=============Health>=70, NO PATH TO TAIL OR TAIL DANGEROUS, CHASE FOOD=========!!')
             print("health",health)   
             direction = chaseFood(foodList, data, board_, head, tail, 0)
         if direction is None:

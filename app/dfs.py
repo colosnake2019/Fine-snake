@@ -8,7 +8,7 @@ def isSafe(x, y, board, goal):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    if (x,y) == goal and get_distance(goal, cur_pos) > 1:
+    if (x,y) == goal and get_distance(goal, cur_pos) > 2 and board[y][x] != 3:
         print('goal tail is 1')
         return True
     return board[y][x] != 4 #or board[y][x] == 0
@@ -58,6 +58,8 @@ def DFS(current_pos, goal_state, board):
     print ('goal_state', goal_state)
     childrenStates = createChild(current_pos, goal_state, board)
     childrenStates = childrenStates[::-1]
+    if board[goal_state[0]][goal_state[1]] == 3:
+        return None
     for child in childrenStates: 
         if dfs_solution(child, goal_state, board):
             print ('path exist from ', current_pos, ' to ', goal_state)
