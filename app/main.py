@@ -209,15 +209,29 @@ def finalChoice(position, board):
     print("final choice direction:", direction)
     return direction
 
-def minLength(board_width):
-    if board_width == 7:
-        return 5
-    if board_width == 11:
-        return 5
-    if board_width == 19: 
-        return 5
+# def minLength(board_width):
+#     if board_width == 7:
+#         return 5
+#     if board_width == 11:
+#         return 10
+#     if board_width == 19: 
+#         return 15
+#     return 5
 
-    return 5
+# def minLength(snakes):
+#     num_of_snakes = len(snakes)
+#     self_length_index = (num_of_snakes-1)/2
+
+
+#     return length
+
+
+# # min health condition that the snake has to find food
+# def minHealth(numofsnakes, numoffood, board_width): 
+#     # food_per_cell = board_width/numoffood
+#     food_per_snake = numoffood/numofsnakes
+
+
 
 #------------------------------------------------API calls------------------------------------------------------
 @bottle.route('/')
@@ -280,11 +294,14 @@ def move():
     
 
     health = data['you']['health']
-    print ('health:', health)
+    print 'health: ', health
 
-    # at the beginning of the game, chase food and increase length to xxx according to snake length
+    # num_of_snakes = data['board']['snakes']
+
+    # -----------------------at the beginning of the game, chase food and increase length to xxx according to snake length--------------
     min_length = minLength(data['board']['width'])
-    if (len(data['you']['body'])<=min_length):
+    # if (len(data['you']['body'])<=min_length):
+    if (len(data['you']['body'])<=5):
         print "!!=============LENGTH<=", min_length, " CHASE FOOD==============!!"
         direction = chaseFood(foodList, data, board_, head, tail, 1)
         if direction is None:
@@ -294,7 +311,8 @@ def move():
         print('move', move_response(direction))
         return move_response(direction)
 
-    #(---------TODO---------- if eat a food at this step, DFS to tail doesnt work, so chase tail around) 
+    #-----------------------------------------------------------------------------------------------------------------------------------
+
     if (health == 100):
         direction = None
         if(get_distance(head, tail) > 1):
@@ -310,46 +328,97 @@ def move():
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
 
-    if (health>=90 and health != 100): # chasing the tail 
-        print('!!==========Health>=70, CHASE TAIL==============!!') 
-        direction = next_direction(data, board_, tail, head)
-        # (------------TODO------------- if there's no path to the tail or tail is dangerous)
-        if direction is None:
-            print('!!=============Health>=70, NO PATH TO TAIL OR TAIL DANGEROUS, CHASE FOOD=========!!')
-            print("health",health)   
-            direction = chaseFood(foodList, data, board_, head, tail, 0)
-        if direction is None:
-            print('!!=============Health>=70, NO PATH TO TAIL, FINAL==========!!')
-            direction = finalChoice(head, board_)
-        print ('next direction: ', direction)
-        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-        return move_response(direction)
     else:
-        # chasing the food in sequence
-        print('!!============Health<70 CHASE FOOD==============!!')
-        direction = chaseFood(foodList, data, board_, head, tail, 0)
-        # no path find for all of the food (----------TODO-----------)   
-        if direction is None: 
-        	print('!!=============NO FOOD!! GO TAIL==============!!')
-        	direction = next_direction(data, board_, tail, head)
-        if direction is None:
-            print('!!=============NO FOOD!! NO TO TAIL, FINAL==============!!')
-            direction = finalChoice(head, board_)
-        print ('next direction: ', direction)
-        print('move', move_response(direction))
-        print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
-        return move_response(direction)
+    '''
+    if num_of_snakes > 4:
+        if health > 90:
+            chase tail
+        else if health < 30:
+            chase food (by distance)
+        else: chase food (safe mode)
+    else:
+        if health > 80:
+            chase tail
+        else if len(food)/len(snake) < 1/2 and health < 40:
+            chase food (by distance)
+        else:
+        chase food 
+    '''
+        snakes = data['board']['snakes']
+        num_of_snakes = len(snakes)
+        if numofsnakes > 4:
+            if health > 90:
+                #chase tail
+                print('!!==========SNAKES >4, Health>90, CHASE TAIL==============!!') 
+                direction = next_direction(data, board_, tail, head)
+                if direction is None:
+                    print 'no path to tail'
+                    direction = chaseFood(foodList, data, board_, head, tail, 0) # chase food 
+                if direction is None:
+                    direction = finalChoice(head, board_)
+                print ('next direction: ', direction)
+                print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+                return move_response(direction)    
+
+            else if health < 30
+                print('!!==========SNAKES >4, Health<30, CHASE FOOD (danger mode)==============!!') 
+                #chase food (by distance)
+
+
+
+            else:
+                print('!!==========SNAKES >4, Health>30 and <=90 CHASE FOOD (safe mode)==============!!') 
+                #chase food (safe mode)
+
+        else:
+            if health > 80:
+                #chase tail
+                print('!!==========SNAKES <=4, Health>80, CHASE TAIL==============!!') 
+            else if (len(data['board']['food'])/num_of_snakes < 1/2) and (health < 40):
+                #chase food (by distance)
+                print('!!==========SNAKES <=4, food/snake < 1/2, heath <40, CHASE TAIL(danger mode)==============!!') 
+            else: 
+                #chase food
+                ('!!==========SNAKES <=4, CHASE FOOD (safe mode)==============!!') 
+
+
+    #(---------TODO---------- if eat a food at this step, DFS to tail doesnt work, so chase tail around) 
+
+
+    # # if health>= 90, chasing the tail
+    # if (health>=90 and health != 100): 
+    #     print('!!==========Health>=70, CHASE TAIL==============!!') 
+    #     direction = next_direction(data, board_, tail, head)
+    #     # (------------TODO------------- if there's no path to the tail or tail is dangerous)
+    #     if direction is None:
+    #         print('!!=============Health>=70, NO PATH TO TAIL OR TAIL DANGEROUS, CHASE FOOD=========!!')
+    #         print("health",health)   
+    #         direction = chaseFood(foodList, data, board_, head, tail, 0)
+    #     if direction is None:
+    #         print('!!=============Health>=70, NO PATH TO TAIL, FINAL==========!!')
+    #         direction = finalChoice(head, board_)
+    #     print ('next direction: ', direction)
+    #     print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+    #     return move_response(direction)
+    # else:
+    #     # chasing the food in sequence
+    #     print('!!============Health<70 CHASE FOOD==============!!')
+    #     direction = chaseFood(foodList, data, board_, head, tail, 0)
+    #     # no path find for all of the food (----------TODO-----------)   
+    #     if direction is None: 
+    #     	print('!!=============NO FOOD!! GO TAIL==============!!')
+    #     	direction = next_direction(data, board_, tail, head)
+    #     if direction is None:
+    #         print('!!=============NO FOOD!! NO TO TAIL, FINAL==============!!')
+    #         direction = finalChoice(head, board_)
+    #     print ('next direction: ', direction)
+    #     print('move', move_response(direction))
+    #     print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
+    #     return move_response(direction)
 
 @bottle.post('/end')
 def end():
     data = bottle.request.json
-
-    """
-    TODO: If your snake AI was stateful,
-        clean up any stateful objects here.
-    """
-    # print(json.dumps(data))
-
     return end_response()
 
 # Expose WSGI app (so gunicorn can find it)
