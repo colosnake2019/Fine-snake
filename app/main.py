@@ -171,11 +171,12 @@ def chaseFood(foodList, data, board_, head, tail, flag):
 
 
 def safeCheck(x, y, board):
+    safe = [0, 2, 3]
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    return board[y][x] == 0 # or board[y][x] == -1
+    return (board[y][x] in safe)
 
 # (-----------TODO---------------)
 def finalChoice(position, board):
@@ -190,12 +191,14 @@ def finalChoice(position, board):
     if safeCheck(x, y-1, board):
         direction['up'] = board[y-1][x]
     if safeCheck(x, y+1, board):
-        next = (x-1,y)
         direction['down'] = board[y+1][x]
 
     sorted_dic = OrderedDict(sorted(direction.items(), key=lambda kv: kv[1], reverse = True))
     directions = sorted_dic.keys()
-    direction = directions[0]
+    if len(directions) > 0:
+        direction = directions[0]
+    else: 
+        direction = 'right'
     # no way to go, then whatever
     print("final choice direction:", direction)
     return direction
@@ -290,7 +293,7 @@ def move():
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
 
-    if (health>=90): # chasing the tail 
+    if (health>=90 and health != 100): # chasing the tail 
         print('!!==========Health>=70, CHASE TAIL==============!!') 
         print("health",health)
         direction = next_direction(data, board_, tail, head)
