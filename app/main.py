@@ -282,7 +282,7 @@ def move():
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
 
-    if (health>=70): # chasing the tail 
+    if (health>=90): # chasing the tail 
         print('!!==========Health>=70, CHASE TAIL==============!!') 
         print("health",health) 
         direction = next_direction(data, board_, tail, head)
