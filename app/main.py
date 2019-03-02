@@ -148,19 +148,27 @@ def finalChoice(position, board):
     x = position[0]
     y = position[1]
     direction = "right"
-
+    finaldirection = {}
     if safeCheck(x-1, y, board):
-        print("go left safe!")
-        direction = "left"
+        finaldirection[(x-1, y)] = board[x-1][y]
+        # print("go left safe!")
+        # direction = "left"
     if safeCheck(x+1, y, board):
-        print("go right safe!")
-        direction = "right"
+        finaldirection[(x+1, y)] = board[x+1][y]
+        # print("go right safe!")
+        # direction = "right"
     if safeCheck(x, y-1, board):
-        print("go up safe!")
-        direction = "up"
+        finaldirection[(x, y-1)] = board[x][y-1]
+        # print("go up safe!")
+        # direction = "up"
     if safeCheck(x, y+1, board):
-        print("go down safe!")
-        direction = "down"
+        finaldirection[(x, y+1)] = board[x][y+1]
+        # print("go down safe!")
+        # direction = "down"
+    sorted_direction = OrderedDict(sorted(finaldirection.items(), key=lambda kv: kv[1]))
+    if len(sorted_direction.keys()) > 0:
+        final = sorted_direction.keys()
+        direction = final[0]
     # no way to go, then whatever
     print("final choice direction:", direction)
     return direction
