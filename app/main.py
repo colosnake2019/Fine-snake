@@ -13,21 +13,21 @@ from api import ping_response, start_response, move_response, end_response
 #------------------------------------------------methods----------------------------------------------
 
 # -----------------------------
-# | 0 | 0 | 5 | 0 | 0 | 0 | 8 |
+# | 0 | 0 | -1 | 0 | 0 | 0 | 0 |
 # -----------------------------
-# | 0 | 1 | 1 | 1 | 0 | 0 | 0 |
+# | 0 | 4 | 4 | 4 | 0 | 0 | 0 |
 # -----------------------------
-# | 0 | 5 | 0 | 0 | 0 | 0 | 0 |
+# | 0 | -1 | 0 | 0 | 0 | 0 | 0 |
 # -----------------------------
-# | 1 | 0 | 0 | 0 | 0 | 5 | 0 |
+# | 4 | 0 | 0 | 0 | 0 | -1 | 0 |
 # -----------------------------
-# | 1 | 0 | 0 | 5 | 0 | 0 | 0 |
+# | 4 | 0 | 0 | -1 | 0 | 0 | 0 |
 # -----------------------------
-# | 1 | 1 | 0 | 0 | 0 | 1 | 0 |
+# | 4 | 4 | 0 | 0 | 0 | 4 | 0 |
 # -----------------------------
-# | 0 | 5 | 0 | 0 | 0 | 1 | 1 |
+# | 0 | -1 | 0 | 0 | 0 | 4 | 4 |
 # -----------------------------
-# 0: safe 1: danger 5:food 
+# 0: food, 0: safe, 2: position will be reached in 2 steps, 3: in 1 step, 4:dangerous 
 
 def setBoard(data, current_pos):
     selfsnake = data['you']
@@ -41,7 +41,7 @@ def setBoard(data, current_pos):
     for each_food in food:
         y = each_food['y']
         x = each_food['x']
-        board[y][x] = 5
+        board[y][x] = 0
         food_pos = (x,y)
         distance = get_distance(current_pos, food_pos)
         foodList[distance] = food_pos
@@ -52,11 +52,11 @@ def setBoard(data, current_pos):
         # set body position
         snake_body = snake['body'][1:]
         for body_frag in snake_body:
-            board[body_frag['y']][body_frag['x']] = 1
+            board[body_frag['y']][body_frag['x']] = 4
 
         # set head position
         snake_head = snake['body'][0]
-        board[snake_head['y']][snake_head['x']] = 1
+        board[snake_head['y']][snake_head['x']] = 4
 
         # reopen tail position (if the snake didnt eat at this step, reopen its tail position)
         if((snake['health']!=100) and (snake['body'][-1]!=snake['body'][-2])):
@@ -71,13 +71,13 @@ def setBoard(data, current_pos):
             around_cells_1 = get_around_cells(snake['body'][0], board_width)
             for each_cell_1 in around_cells_1:
                 cell = board[each_cell_1['y']][each_cell_1['x']]
-                if (cell==0 or cell==5):
-                    board[each_cell_1['y']][each_cell_1['x']] = 2 # next 1 step
+                if (cell==0): #or cell==-1
+                    board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
                 around_cells_2 = get_around_cells(each_cell_1, board_width)
                 for each_cell_2 in around_cells_2:
                     cell =  board[each_cell_2['y']][each_cell_2['x']]
-                    if(cell==0 or cell==5):
-                        board[each_cell_2['y']][each_cell_2['x']] = 3 # next 2 step
+                    if(cell==0): #or cell==-1
+                        board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
 
     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
@@ -129,7 +129,8 @@ def chaseFood(foodList, data, board_, head, tail, flag):
         direction_head_to_food = next_direction(data, board_, food, head)
         if direction_head_to_food is not None: # check there is path from head to food
             # if flag == 1 means the game just start, no need to test path from food to tail
-            if (flag == 1) or (get_distance(tail, food) > 125) or (next_direction(data, board_, tail, food) is not None): # check there is path from food to tail
+            if (flag == 1) or (next_direction(data, board_, tail, food) is not None): # check there is path from food to tail
+                # or (get_distance(tail, food) > 225)
                 print('There is path from food ', food, 'to tail')
                 return direction_head_to_food
     return None
@@ -140,7 +141,7 @@ def safeCheck(x, y, board):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    return board[y][x] == 0 or board[y][x] == 5;
+    return board[y][x] == 0 # or board[y][x] == -1
 
 # (-----------TODO---------------)
 def finalChoice(position, board):
@@ -240,8 +241,8 @@ def move():
     if (health == 100):
         print('!!========HEALTH FULL, CHASE TAIL==============!!') 
         direction = next_direction(data, board_, tail, head)
-        print('!!=============CHASE FOOD==============!!') 
         if direction is None:
+            print('!!=============CHASE FOOD==============!!') 
             direction = chaseFood(foodList, data, board_, head, tail, 0)
         if direction is None:
             print('!!=========HEALTH FULL, NO PATH TO FOOD, FINAL==============!!')
