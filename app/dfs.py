@@ -10,7 +10,7 @@ def isSafe(x, y, board, goal):
     if x<0 or x>(len(board[0])-1):
         return False    
     if get_distance((x,y), cur_pos) > 2:
-        return (board[y][x] in safe)  #or board[y][x] == 0
+        return (board[y][x] in safeone)  #or board[y][x] == 0
     return (board[y][x] in safetwo)
 
 # calculate the distance between two points
