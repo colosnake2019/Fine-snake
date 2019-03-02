@@ -140,14 +140,14 @@ def get_food_positions(data):
     return data['board']['food'];
 
 # this method will return the next direction e.g. 'up'
-def next_direction(data, board, destination, current_pos):
+def next_direction(data, board, destination, current_pos, health_flag):
     # print 'data:' , data
     print ('turn: ', data['turn'])
     print ('current pos: ', current_pos)
     # direction = data['turn']
     health = data['you']['health']
     direction = 'up'
-    next_pos = DFS(current_pos, destination, board)
+    next_pos = DFS(current_pos, destination, board, health_flag)
     if(next_pos is None):
         return None
     print ('next pos: ', next_pos)
@@ -158,16 +158,16 @@ def next_direction(data, board, destination, current_pos):
 
     return direction
 
-def chaseFood(foodList, data, board_, head, tail, flag):
+def chaseFood(foodList, data, board_, head, tail, flag, health_flag):
     close_food = []
     food_sub_list = foodList
     if (len(foodList)>=4):
         food_sub_list = foodList[0:4]
     for food in food_sub_list:
-        direction_head_to_food = next_direction(data, board_, food, head)
+        direction_head_to_food = next_direction(data, board_, food, head, health_flag)
         if direction_head_to_food is not None: # check there is path from head to food
             # if flag == 1 means the game just start, no need to test path from food to tail
-            if (flag == 1) or (next_direction(data, board_, tail, food) is not None): # check there is path from food to tail
+            if (flag == 1) or (next_direction(data, board_, tail, food, health_flag) is not None): # check there is path from food to tail
                 # or (get_distance(tail, food) > 225)
                 print('There is path from food', food, 'to tail')
                 return direction_head_to_food
@@ -286,7 +286,7 @@ def move():
     min_length = minLength(data['board']['width'])
     if (len(data['you']['body'])<=min_length):
         print "!!=============LENGTH<=", min_length, " CHASE FOOD==============!!"
-        direction = chaseFood(foodList, data, board_, head, tail, 1)
+        direction = chaseFood(foodList, data, board_, head, tail, 1, 'C')
         if direction is None:
             direction = finalChoice(head, board_)
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
@@ -300,10 +300,10 @@ def move():
         if(get_distance(head, tail) > 1):
             print('!!========HEALTH FULL, CHASE TAIL==============!!')
             board_[tail[1]][tail[0]] = 0
-            direction = next_direction(data, board_, tail, head)
+            direction = next_direction(data, board_, tail, head, 'C')
         else:
             print('!!=============CHASE FOOD==============!!') 
-            direction = chaseFood(foodList, data, board_, head, tail, 0)
+            direction = chaseFood(foodList, data, board_, head, tail, 0, 'C')
         if direction is None:
             print('!!=========HEALTH FULL, NO PATH TO FOOD, FINAL==============!!')
             direction = finalChoice(head, board_)
@@ -312,12 +312,12 @@ def move():
 
     if (health>=90 and health != 100): # chasing the tail 
         print('!!==========Health>=70, CHASE TAIL==============!!') 
-        direction = next_direction(data, board_, tail, head)
+        direction = next_direction(data, board_, tail, head, 'C')
         # (------------TODO------------- if there's no path to the tail or tail is dangerous)
         if direction is None:
             print('!!=============Health>=70, NO PATH TO TAIL OR TAIL DANGEROUS, CHASE FOOD=========!!')
             print("health",health)   
-            direction = chaseFood(foodList, data, board_, head, tail, 0)
+            direction = chaseFood(foodList, data, board_, head, tail, 0, 'C')
         if direction is None:
             print('!!=============Health>=70, NO PATH TO TAIL, FINAL==========!!')
             direction = finalChoice(head, board_)
@@ -327,11 +327,11 @@ def move():
     else:
         # chasing the food in sequence
         print('!!============Health<70 CHASE FOOD==============!!')
-        direction = chaseFood(foodList, data, board_, head, tail, 0)
+        direction = chaseFood(foodList, data, board_, head, tail, 0, 'C')
         # no path find for all of the food (----------TODO-----------)   
         if direction is None: 
         	print('!!=============NO FOOD!! GO TAIL==============!!')
-        	direction = next_direction(data, board_, tail, head)
+        	direction = next_direction(data, board_, tail, head, 'C')
         if direction is None:
             print('!!=============NO FOOD!! NO TO TAIL, FINAL==============!!')
             direction = finalChoice(head, board_)
