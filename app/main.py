@@ -195,7 +195,10 @@ def finalChoice(position, board):
 
     sorted_dic = OrderedDict(sorted(direction.items(), key=lambda kv: kv[1], reverse = True))
     directions = sorted_dic.keys()
-    direction = directions[0]
+    if len(directions) > 0:
+        direction = directions[0]
+    else: 
+        direction = 'right'
     # no way to go, then whatever
     print("final choice direction:", direction)
     return direction
@@ -290,7 +293,7 @@ def move():
         print("--- %s miliseconds ---" % int((time.time() - start_time) * 1000))
         return move_response(direction)
 
-    if (health>=90): # chasing the tail 
+    if (health>=90 and health != 100): # chasing the tail 
         print('!!==========Health>=70, CHASE TAIL==============!!') 
         print("health",health)
         direction = next_direction(data, board_, tail, head)
