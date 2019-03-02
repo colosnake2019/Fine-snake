@@ -255,6 +255,7 @@ def move():
     tail_pos_y = data['you']['body'][-1]['y']
     tail = (tail_pos_x, tail_pos_y)
     board_, foodList = setBoard(data, head)
+    board_[y][x] = 1
 
     health = data['you']['health']
 
