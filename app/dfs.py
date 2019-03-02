@@ -3,13 +3,15 @@ from collections import OrderedDict
 
 # 0/5: safe 1:danger
 def isSafe(x, y, board, goal):
-    safe = [0, 2, 3]
+    safeone = [0, 2, 3]
+    safetwo = [0, 2]
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
         return False    
-
-    return (board[y][x] in safe)  #or board[y][x] == 0
+    if get_distance((x,y), cur_pos) > 2:
+        return (board[y][x] in safe)  #or board[y][x] == 0
+    return (board[y][x] in safetwo)
 
 # calculate the distance between two points
 def get_distance(start, end):
