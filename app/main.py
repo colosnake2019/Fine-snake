@@ -29,6 +29,33 @@ from api import ping_response, start_response, move_response, end_response
 # -----------------------------
 # 0: food, 0: safe, 2: position will be reached in 2 steps, 3: in 1 step, 4:dangerous 
 
+def getFoodScore(x, y, board):
+    count =0
+    score = 0
+    if(outOfBoard(x+1, y, board) == False):
+        score += board[y][x+1]
+        count += 1
+    if(outOfBoard(x-1, y, board) == False):
+        score += board[y][x-1]
+        count += 1
+    if(outOfBoard(x, y+1, board) == False):
+        score += board[y+1][x]
+        count += 1
+    if(outOfBoard(x, y-1, board) == False):
+        score += board[y-1][x]
+        count += 1
+
+    if count > 0:
+        avg = score / count
+        return avg
+    return 0
+
+
+def outOfBoard(x, y, board):
+    if (x<0 or x>=len(board[0])): return True
+    if (y<0 or y>=len(board)): return True
+    return False
+
 def setBoard(data, current_pos):
     selfsnake = data['you']
     board_width = data['board']['width']
@@ -44,7 +71,7 @@ def setBoard(data, current_pos):
         board[y][x] = 0
         food_pos = (x,y)
         distance = get_distance(current_pos, food_pos)
-        foodList[distance] = food_pos
+        foodList[food_pos] = distance
 
     snakes = data['board']['snakes']
     for snake in snakes:
@@ -79,13 +106,18 @@ def setBoard(data, current_pos):
                     if(cell==0): #or cell==-1
                         board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
+    
+    foodScores = {}
+    for each_food in foodList.keys():
+        score = getFoodScore(each_food[0], each_food[1], board)
+        foodScores[each_food] = (score, foodList[each_food])
 
+    foodOrderValues = OrderedDict(sorted(foodScores.items(), key=lambda kv: kv[1]))
+    
+    # print(board)
     print('\n'.join([''.join(['{:4}'.format(item) for item in row]) 
       for row in board]))
-
-    orderedFoodList = OrderedDict(sorted(foodList.items()))
-    # print(board)
-    return board, orderedFoodList.values()
+    return board, foodOrderValues.keys()
 
 # up, down, left, right cell coordinates of a cell
 def get_around_cells(cell, board_width):
@@ -141,34 +173,26 @@ def safeCheck(x, y, board):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    return board[y][x] != 4 # or board[y][x] == -1
+    return board[y][x] == 0 # or board[y][x] == -1
 
 # (-----------TODO---------------)
 def finalChoice(position, board):
     x = position[0]
     y = position[1]
     direction = "right"
-    finaldirection = {}
+
     if safeCheck(x-1, y, board):
-        finaldirection[(x-1, y)] = board[x-1][y]
-        # print("go left safe!")
-        # direction = "left"
+        print("go left safe!")
+        direction = "left"
     if safeCheck(x+1, y, board):
-        finaldirection[(x+1, y)] = board[x+1][y]
-        # print("go right safe!")
-        # direction = "right"
+        print("go right safe!")
+        direction = "right"
     if safeCheck(x, y-1, board):
-        finaldirection[(x, y-1)] = board[x][y-1]
-        # print("go up safe!")
-        # direction = "up"
+        print("go up safe!")
+        direction = "up"
     if safeCheck(x, y+1, board):
-        finaldirection[(x, y+1)] = board[x][y+1]
-        # print("go down safe!")
-        # direction = "down"
-    sorted_direction = OrderedDict(sorted(finaldirection.items(), key=lambda kv: kv[1]))
-    if len(sorted_direction.keys()) > 0:
-        final = sorted_direction.keys()
-        direction = final[0]
+        print("go down safe!")
+        direction = "down"
     # no way to go, then whatever
     print("final choice direction:", direction)
     return direction
