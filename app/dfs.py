@@ -8,9 +8,13 @@ def isSafe(x, y, board, goal):
     if y<0 or y>(len(board)-1):
         return False
     if x<0 or x>(len(board[0])-1):
-        return False    
-    if get_distance((x,y), cur_pos) > 2:
-        return (board[y][x] in safeone)  #or board[y][x] == 0
+        return False
+    if (health_flag == 'A'):
+        return (board[y][x] in safetwo)
+    elif (health_flag == 'B'):
+        return (board[y][x] in safetwo)
+    elif get_distance((x,y), cur_pos) > 2:
+        return (board[y][x] in safeone)
     return (board[y][x] in safetwo)
 
 # calculate the distance between two points
@@ -44,13 +48,15 @@ def createChild(position, goal, board):
     return sorted_children.keys()
 
 
-def DFS(current_pos, goal_state, board):
+def DFS(current_pos, goal_state, board, flag):
     global cur_pos
     cur_pos = current_pos
+    global health_flag
+    health_flag = flag
     print ('goal_state', goal_state)
     childrenStates = createChild(current_pos, goal_state, board)
     childrenStates = childrenStates[::-1]
-    if board[goal_state[0]][goal_state[1]] == 3: # if goal_state safe check is 3, don't go
+    if board[goal_state[1]][goal_state[0]] == 3: # if goal_state safe check is 3, don't go
         return None
     for child in childrenStates:
         if dfs_solution(child, goal_state, board):
