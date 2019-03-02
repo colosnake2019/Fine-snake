@@ -155,8 +155,8 @@ def next_direction(data, board, destination, current_pos):
 def chaseFood(foodList, data, board_, head, tail, flag):
     close_food = []
     food_sub_list = foodList
-    if (len(foodList)>=4):
-        food_sub_list = foodList[0:4]
+    # if (len(foodList)>=4):
+    #     food_sub_list = foodList[0:4]
     for food in food_sub_list:
         direction_head_to_food = next_direction(data, board_, food, head)
         if direction_head_to_food is not None: # check there is path from head to food
@@ -234,7 +234,7 @@ def start():
     """
     # print(json.dumps(data))
 
-    color = "#e6e600"
+    color = "#7037c6"
     headType = "silly"
     tailType = "bolt"
 
@@ -255,6 +255,7 @@ def move():
     tail_pos_y = data['you']['body'][-1]['y']
     tail = (tail_pos_x, tail_pos_y)
     board_, foodList = setBoard(data, head)
+    board_[y][x] = 1
 
     health = data['you']['health']
 
