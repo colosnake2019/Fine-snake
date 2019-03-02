@@ -87,9 +87,13 @@ def setBoard(data, current_pos):
         board[snake_head['y']][snake_head['x']] = 4
 
         # reopen tail position (if the snake didnt eat at this step, reopen its tail position)
-        if((snake['health']!=100) and (snake['body'][-1]!=snake['body'][-2])):
-            snake_tail = snake['body'][-1]
-            board[snake_tail['y']][snake_tail['x']] = 0
+        # if((snake['health']!=100) and (snake['body'][-1]!=snake['body'][-2])):
+        # if((snake['health']!=100): # didnt eat
+        if len(snake['body'])>=3: # length>=3
+            if snake['body'][-1]!=snake['body'][-2]: # tail not overlap
+                snake_tail = snake['body'][-1]
+                board[snake_tail['y']][snake_tail['x']] = 0
+                print 'reopen tail position with position: ', snake_tail
 
         # (----------------TODO-------------------)
         # set longer snakes' potential next head positions    
@@ -205,6 +209,16 @@ def finalChoice(position, board):
     print("final choice direction:", direction)
     return direction
 
+def minLength(board_width):
+    if board_width == 7:
+        return 5
+    if board_width == 11:
+        return 10
+    if board_width == 19: 
+        return 15
+
+    return 5
+
 #------------------------------------------------API calls------------------------------------------------------
 @bottle.route('/')
 def index():
@@ -242,7 +256,7 @@ def start():
     """
     # print(json.dumps(data))
 
-    color = "#ffcccc"
+    color = "#ffff33"
     headType = "silly"
     tailType = "bolt"
 
@@ -268,9 +282,10 @@ def move():
     health = data['you']['health']
     print ('health:', health)
 
-    # at the beginning of the game, chase food and increase length to 5
-    if (len(data['you']['body'])<=10):
-        print('!!=============LENGTH<=10 CHASE FOOD==============!!')
+    # at the beginning of the game, chase food and increase length to xxx according to snake length
+    min_length = minLength(data['board']['width'])
+    if (len(data['you']['body'])<=min_length):
+        print "!!=============LENGTH<=", min_length, " CHASE FOOD==============!!"
         direction = chaseFood(foodList, data, board_, head, tail, 1)
         if direction is None:
             direction = finalChoice(head, board_)
