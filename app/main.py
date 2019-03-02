@@ -95,18 +95,18 @@ def setBoard(data, current_pos):
         # set longer snakes' potential next head positions    
         snake_length = len(snake['body'])
         self_length = len(selfsnake['body'])
-        if (board_width > 10 and board_width < 15 and numSnakes < 5) or (board_width > 15 and numSnakes < 10):
-            if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
-                around_cells_1 = get_around_cells(snake['body'][0], board_width)
-                for each_cell_1 in around_cells_1:
-                    cell = board[each_cell_1['y']][each_cell_1['x']]
-                    if (cell==0): #or cell==-1
-                        board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
-                    around_cells_2 = get_around_cells(each_cell_1, board_width)
-                    for each_cell_2 in around_cells_2:
-                        cell =  board[each_cell_2['y']][each_cell_2['x']]
-                        if(cell==0): #or cell==-1
-                            board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
+        #if (board_width > 10 and board_width < 15 and numSnakes < 5) or (board_width > 15 and numSnakes < 10):
+        if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
+            around_cells_1 = get_around_cells(snake['body'][0], board_width)
+            for each_cell_1 in around_cells_1:
+                cell = board[each_cell_1['y']][each_cell_1['x']]
+                if (cell==0): #or cell==-1
+                    board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
+                around_cells_2 = get_around_cells(each_cell_1, board_width)
+                for each_cell_2 in around_cells_2:
+                    cell =  board[each_cell_2['y']][each_cell_2['x']]
+                    if(cell==0): #or cell==-1
+                        board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
     # foodScores = {}
     # for each_food in foodList.keys():
@@ -181,20 +181,21 @@ def safeCheck(x, y, board):
 def finalChoice(position, board):
     x = position[0]
     y = position[1]
-    direction = "right"
+    direction = {}
 
     if safeCheck(x-1, y, board):
-        print("go left safe!")
-        direction = "left"
+        direction['left'] = board[y][x-1]
     if safeCheck(x+1, y, board):
-        print("go right safe!")
-        direction = "right"
+        direction['right'] = board[y][x+1]
     if safeCheck(x, y-1, board):
-        print("go up safe!")
-        direction = "up"
+        direction['up'] = board[y-1][x]
     if safeCheck(x, y+1, board):
-        print("go down safe!")
-        direction = "down"
+        next = (x-1,y)
+        direction['down'] = board[y+1][x]
+
+    sorted_dic = OrderedDict(sorted(direction.items(), key=lambda kv: kv[1], reverse = True))
+    directions = sorted_dic.keys()
+    direction = directions[0]
     # no way to go, then whatever
     print("final choice direction:", direction)
     return direction

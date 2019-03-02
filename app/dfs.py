@@ -73,9 +73,9 @@ def dfs_solution(current_pos, goal_state, board):
             explored.append(node)
             trackExplored[node] = 0
         if node == goal_state:
-            print('explored', explored)
+            #print('explored', explored)
             return True
         child_list = createChild(node, goal_state, board)
         frontier.extend(child for child in child_list if child not in trackExplored and child not in frontier)
-    print('explored', explored)
+    #print('explored', explored)
     return False
