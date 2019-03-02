@@ -213,9 +213,9 @@ def minLength(board_width):
     if board_width == 7:
         return 5
     if board_width == 11:
-        return 10
+        return 5
     if board_width == 19: 
-        return 15
+        return 5
 
     return 5
 
