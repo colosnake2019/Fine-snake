@@ -74,6 +74,7 @@ def setBoard(data, current_pos):
         foodList[food_pos] = distance
 
     snakes = data['board']['snakes']
+    numSnakes = len(snakes)
     for snake in snakes:
         print ('snake body', snake['body'])
         # set body position
@@ -94,17 +95,18 @@ def setBoard(data, current_pos):
         # set longer snakes' potential next head positions    
         snake_length = len(snake['body'])
         self_length = len(selfsnake['body'])
-        if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
-            around_cells_1 = get_around_cells(snake['body'][0], board_width)
-            for each_cell_1 in around_cells_1:
-                cell = board[each_cell_1['y']][each_cell_1['x']]
-                if (cell==0): #or cell==-1
-                    board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
-                around_cells_2 = get_around_cells(each_cell_1, board_width)
-                for each_cell_2 in around_cells_2:
-                    cell =  board[each_cell_2['y']][each_cell_2['x']]
-                    if(cell==0): #or cell==-1
-                        board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
+        if (board_width > 10 and board_width < 15 and numSnakes < 5) or (board_width > 15 and numSnakes < 10):
+            if((snake['id']!=selfsnake['id']) and (snake_length>=self_length)):
+                around_cells_1 = get_around_cells(snake['body'][0], board_width)
+                for each_cell_1 in around_cells_1:
+                    cell = board[each_cell_1['y']][each_cell_1['x']]
+                    if (cell==0): #or cell==-1
+                        board[each_cell_1['y']][each_cell_1['x']] = 3 # next 1 step
+                    around_cells_2 = get_around_cells(each_cell_1, board_width)
+                    for each_cell_2 in around_cells_2:
+                        cell =  board[each_cell_2['y']][each_cell_2['x']]
+                        if(cell==0): #or cell==-1
+                            board[each_cell_2['y']][each_cell_2['x']] = 2 # next 2 step
 
     
     foodScores = {}
@@ -255,9 +257,10 @@ def move():
     tail_pos_y = data['you']['body'][-1]['y']
     tail = (tail_pos_x, tail_pos_y)
     board_, foodList = setBoard(data, head)
-    board_[y][x] = 1
+    board_[y][x] = 0
 
     health = data['you']['health']
+    print ('health:', health)
 
     # at the beginning of the game, chase food and increase length to 5
     if (len(data['you']['body'])<=5):
