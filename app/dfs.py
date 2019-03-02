@@ -8,10 +8,10 @@ def isSafe(x, y, board, goal):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    if (x,y) == goal and get_distance(goal, cur_pos) >= 1:
+    if (x,y) == goal and get_distance(goal, cur_pos) > 1:
         print('goal tail is 1')
         return True
-    return board[y][x] == 0 #or board[y][x] == 0
+    return board[y][x] != 4 #or board[y][x] == 0
 
 # calculate the distance between two points
 def get_distance(start, end):

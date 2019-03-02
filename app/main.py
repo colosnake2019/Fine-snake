@@ -141,7 +141,7 @@ def safeCheck(x, y, board):
         return False
     if x<0 or x>(len(board[0])-1):
         return False
-    return board[y][x] == 0 # or board[y][x] == -1
+    return board[y][x] != 4 # or board[y][x] == -1
 
 # (-----------TODO---------------)
 def finalChoice(position, board):
