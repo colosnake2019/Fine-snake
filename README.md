@@ -14,11 +14,8 @@ TBC
 
 #### heroku url: https://ccilosnake.herokuapp.com/
 #### This is: A [Battlesnake AI](http://battlesnake.io) written in Python. 
-- [Docs and APIs](https://docs.battlesnake.io/)
-- Visit [https://github.com/battlesnakeio/community/blob/master/starter-snakes.md](https://github.com/battlesnakeio/community/blob/master/starter-snakes.md) for API documentation and instructions for running the AI.
-- This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on Heroku. Dependencies are listed in [requirements.txt](requirements.txt).
-
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+- [Docs and APIs](https://docs.battlesnake.io/)  
+- [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ----
 
