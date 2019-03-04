@@ -1,26 +1,35 @@
 
 
-# starter-snake-python
+# Fine. Snake :snake:
 
-A simple [Battlesnake AI](http://battlesnake.io) written in Python. 
+#### team : Are You Okay?
+- [Catherine Meng](https://github.com/MCatherine1994)
+- [Chloe Yu](https://github.com/Chloeiii)
+- [Licht Liu](https://github.com/xylliu)
+- [Olivia Zhu](https://github.com/JJingg)
 
-Visit [https://github.com/battlesnakeio/community/blob/master/starter-snakes.md](https://github.com/battlesnakeio/community/blob/master/starter-snakes.md) for API documentation and instructions for running your AI.
+#### Our strat:
+TBC
 
-This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on Heroku. Dependencies are listed in [requirements.txt](requirements.txt).
+
+#### heroku url: https://ccilosnake.herokuapp.com/
+#### This is: A [Battlesnake AI](http://battlesnake.io) written in Python. 
+- [Docs and APIs](https://docs.battlesnake.io/)
+- Visit [https://github.com/battlesnakeio/community/blob/master/starter-snakes.md](https://github.com/battlesnakeio/community/blob/master/starter-snakes.md) for API documentation and instructions for running the AI.
+- This AI client uses the [bottle web framework](http://bottlepy.org/docs/dev/index.html) to serve requests and the [gunicorn web server](http://gunicorn.org/) for running bottle on Heroku. Dependencies are listed in [requirements.txt](requirements.txt).
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ----
 
-#### You will need...
+#### Prerequests
 
 * a working Python 2.7 development environment ([getting started guide](http://hackercodex.com/guide/python-development-environment-on-mac-osx/))
-* experience [deploying Python apps to Heroku](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
 * [pip](https://pip.pypa.io/en/latest/installing.html) to install Python dependencies
 
 ----
 
-## Running the Snake Locally:womans_hat:
+### Running the Snake Locally:womans_hat:
 
 1) [Fork this repo](https://github.com/battlesnakeio/starter-snake-python/fork).
 
@@ -44,7 +53,7 @@ python app/main.py
 curl -XPOST -H 'Content-Type: application/json' -d '{ "hello": "world"}' http://localhost:8080/start
 ```
 
-## Deploying to Heroku:sushi:
+### Deploying to Heroku:sushi:
 
 1) Create a new Heroku app:
 ```
@@ -68,7 +77,7 @@ heroku logs --tail
 ```
 
 
-## [Start the engine](https://docs.battlesnake.io/):sparkling_heart:
+### [Start the engine](https://docs.battlesnake.io/):sparkling_heart:
 
 **MAC OS Example:**   
 1. Install Brew
@@ -101,9 +110,3 @@ heroku logs --tail
 		./engine dev
 
 7. Open a browser and go to [http://localhost:3010/](http://localhost:3010/)
-
-
-----
-## Questions?
-
-Email [battlesnake@sendwithus.com](mailto:battlesnake@sendwithus.com), or tweet [@send_with_us](http://twitter.com/send_with_us).
