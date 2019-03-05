@@ -9,7 +9,14 @@
 - [Olivia Zhu](https://github.com/JJingg)
 
 #### Our strat:
+The Strategy of our Fine. snake is based on DFS searching algorithm. We want to make sure our snake could always find a safe path from its head to tail on its way to the food. It turns out that the Fine snake performs outstanding when it runs alone on the board (achieved 3000+ turns on a 11x11 board), or during 1v1 battle with one other snake. During the BattleSnake 2019 event, we won 3 Bounty Snakes in total (snakes from Giftbit, TELMEDIQ, and Semaphore). 
+
 TBC
+
+
+
+
+
 
 
 #### heroku url: https://ccilosnake.herokuapp.com/
