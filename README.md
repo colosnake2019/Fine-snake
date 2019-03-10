@@ -9,11 +9,10 @@
 - [Olivia Zhu](https://github.com/JJingg)
 
 #### Our strat:
-The Strategy of our Fine. snake is based on DFS searching algorithm. We want to make sure our snake could always find a safe path from its head to tail on its way to the food. It turns out that the Fine snake performs outstanding when it runs alone on the board (achieved 3000+ turns on a 11x11 board), or during 1v1 battle with one other snake. During the BattleSnake 2019 event, we won 3 Bounty Snakes in total (snakes from Giftbit, TELMEDIQ, and Semaphore). 
-
-TBC
+The Strategy of our Fine snake is based on DFS searching algorithm. We want to make sure our snake could always find a safe path from its head to tail on its way to the food. It turns out that the Fine snake performs outstanding when it runs alone on the board (achieved 3000+ turns on a 11x11 board), or during 1v1 battle with one other snake. During the BattleSnake 2019 event, we won 3 Bounty Snakes in total (snakes from Giftbit, TELMEDIQ, and Semaphore). 
 
 
+Basically, based on the prediction of longer snakes' next steps, we have 3 DFS searching mode in totall. Mode C is the danger mode, in which we consider all the cells without considering other snakes' next steps. Mode B is the normal mode, in this case we consider longer snakes' one step ahead, we'll try to avoid those cells when we calculate the path. Mode A is the ...
 
 
 
